@@ -134,7 +134,7 @@ const AboutPage = () => {
             <div className="leader-profile card">
               <div className="leader-image-container">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/h3pgtud5_WhatsApp%20Image%202025-09-13%20at%2011.49.35.jpeg" 
+                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/f4xxl94c_WhatsApp%20Image%202025-09-13%20at%2008.07.04.jpeg" 
                   alt="Apostle Sandra Ross" 
                   className="leader-image"
                 />
