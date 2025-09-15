@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Heart, Users, Building2, DollarSign, BookOpen, CheckCircle, AlertCircle, Loader, Handshake, Target, Globe } from 'lucide-react';
+import { Heart, Users, Building2, DollarSign, BookOpen, CheckCircle, AlertCircle, Loader, Handshake, Target, Globe, Upload, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 
 const PartnershipPage = () => {
