@@ -78,6 +78,76 @@ class WHIBCAPITester:
             200
         )
 
+    def test_admin_login_valid(self):
+        """Test admin login with valid credentials"""
+        login_data = {
+            "username": "admin",
+            "password": "whibc2025"
+        }
+        
+        success, response = self.run_test(
+            "Admin Login (Valid Credentials)",
+            "POST",
+            "api/admin/login",
+            200,
+            data=login_data
+        )
+        
+        if success and response:
+            self.admin_token = response.get('access_token')
+            print(f"✅ Admin token obtained: {self.admin_token[:20]}...")
+            print(f"Token type: {response.get('token_type')}")
+            print(f"Expires in: {response.get('expires_in')} seconds")
+            admin_info = response.get('admin_info', {})
+            print(f"Admin username: {admin_info.get('username')}")
+            print(f"Admin role: {admin_info.get('role')}")
+        
+        return success
+
+    def test_admin_login_invalid(self):
+        """Test admin login with invalid credentials"""
+        login_data = {
+            "username": "admin",
+            "password": "wrongpassword"
+        }
+        
+        return self.run_test(
+            "Admin Login (Invalid Credentials)",
+            "POST",
+            "api/admin/login",
+            401,  # Unauthorized expected
+            data=login_data
+        )
+
+    def test_admin_login_superadmin(self):
+        """Test superadmin login"""
+        login_data = {
+            "username": "superadmin",
+            "password": "whibc@admin2025"
+        }
+        
+        return self.run_test(
+            "Superadmin Login",
+            "POST",
+            "api/admin/login",
+            200,
+            data=login_data
+        )
+
+    def test_verify_admin_token(self):
+        """Test token verification endpoint"""
+        if not self.admin_token:
+            print("❌ No admin token available for verification test")
+            return False
+            
+        return self.run_test(
+            "Verify Admin Token",
+            "POST",
+            "api/admin/verify-token",
+            200,
+            auth_required=True
+        )
+
     def test_student_registration(self):
         """Test student registration endpoint with form data"""
         test_data = {
