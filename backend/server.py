@@ -1,6 +1,7 @@
-from fastapi import FastAPI, APIRouter, HTTPException, BackgroundTasks, File, UploadFile, Form
+from fastapi import FastAPI, APIRouter, HTTPException, BackgroundTasks, File, UploadFile, Form, Depends, status
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -10,9 +11,11 @@ from pathlib import Path
 from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import aiofiles
 import shutil
+import jwt
+import hashlib
 
 
 ROOT_DIR = Path(__file__).parent
@@ -36,6 +39,20 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 # Mount static files
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
+# JWT Configuration
+JWT_SECRET = os.getenv('JWT_SECRET', 'whibc-admin-secret-key-2025')
+JWT_ALGORITHM = 'HS256'
+JWT_EXPIRATION_HOURS = 24
+
+# Security
+security = HTTPBearer()
+
+# Admin credentials (in production, these should be in database with proper hashing)
+ADMIN_CREDENTIALS = {
+    "admin": "whibc2025",  # username: password
+    "superadmin": "whibc@admin2025"
+}
+
 
 # Email Service Class
 class EmailDeliveryError(Exception):
@@ -56,6 +73,16 @@ def send_email_simple(to: str, subject: str, content: str):
 
 
 # Define Models
+class AdminLogin(BaseModel):
+    username: str
+    password: str
+
+class AdminLoginResponse(BaseModel):
+    access_token: str
+    token_type: str
+    expires_in: int
+    admin_info: dict
+
 class StudentRegistration(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     full_name: str
@@ -122,6 +149,47 @@ def prepare_for_mongo(data):
     if isinstance(data.get('created_at'), datetime):
         data['created_at'] = data['created_at'].isoformat()
     return data
+
+
+# Authentication functions
+def hash_password(password: str) -> str:
+    """Hash password using SHA256"""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def verify_password(plain_password: str, username: str) -> bool:
+    """Verify password against stored credentials"""
+    return ADMIN_CREDENTIALS.get(username) == plain_password
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    """Create JWT access token"""
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS)
+    
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return encoded_jwt
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Verify JWT token"""
+    try:
+        payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authentication credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return username
+    except jwt.PyJWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 # Email templates
@@ -217,6 +285,49 @@ async def save_uploaded_file(file: UploadFile, prefix: str) -> tuple:
 @api_router.get("/")
 async def root():
     return {"message": "Word of Hope International Bible College API", "status": "active"}
+
+# Admin Authentication Routes
+@api_router.post("/admin/login", response_model=AdminLoginResponse)
+async def admin_login(credentials: AdminLogin):
+    """Admin login endpoint"""
+    try:
+        if not verify_password(credentials.password, credentials.username):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        # Create access token
+        access_token_expires = timedelta(hours=JWT_EXPIRATION_HOURS)
+        access_token = create_access_token(
+            data={"sub": credentials.username}, expires_delta=access_token_expires
+        )
+        
+        return AdminLoginResponse(
+            access_token=access_token,
+            token_type="bearer",
+            expires_in=JWT_EXPIRATION_HOURS * 3600,  # in seconds
+            admin_info={
+                "username": credentials.username,
+                "role": "administrator",
+                "permissions": ["read", "write", "admin"]
+            }
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Admin login error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Login failed")
+
+@api_router.post("/admin/verify-token")
+async def verify_admin_token(current_user: str = Depends(verify_token)):
+    """Verify admin token"""
+    return {
+        "valid": True,
+        "username": current_user,
+        "role": "administrator"
+    }
 
 @api_router.post("/register-student", response_model=EmailResponse)
 async def register_student(
@@ -330,8 +441,9 @@ async def submit_partnership(
         logging.error(f"Partnership submission error: {str(e)}")
         raise HTTPException(status_code=500, detail="Partnership submission failed. Please try again.")
 
+# Protected Admin Routes
 @api_router.get("/registrations", response_model=List[StudentRegistration])
-async def get_registrations():
+async def get_registrations(current_user: str = Depends(verify_token)):
     """Get all student registrations (admin endpoint)"""
     try:
         registrations = await db.student_registrations.find().sort("created_at", -1).to_list(1000)
@@ -341,7 +453,7 @@ async def get_registrations():
         raise HTTPException(status_code=500, detail="Failed to fetch registrations")
 
 @api_router.get("/partnerships", response_model=List[Partnership])
-async def get_partnerships():
+async def get_partnerships(current_user: str = Depends(verify_token)):
     """Get all partnerships (admin endpoint)"""
     try:
         partnerships = await db.partnerships.find().sort("created_at", -1).to_list(1000)
@@ -355,9 +467,10 @@ async def upload_gallery_image(
     title: str = Form(...),
     description: str = Form(...),
     category: str = Form(...),
-    image: UploadFile = File(...)
+    image: UploadFile = File(...),
+    current_user: str = Depends(verify_token)
 ):
-    """Upload image to gallery"""
+    """Upload image to gallery (admin only)"""
     try:
         # Save image file
         filename, file_path = await save_uploaded_file(image, "gallery")
@@ -391,7 +504,7 @@ async def get_gallery():
         raise HTTPException(status_code=500, detail="Failed to fetch gallery")
 
 @api_router.get("/admin/dashboard")
-async def admin_dashboard():
+async def admin_dashboard(current_user: str = Depends(verify_token)):
     """Get admin dashboard data"""
     try:
         total_registrations = await db.student_registrations.count_documents({})
