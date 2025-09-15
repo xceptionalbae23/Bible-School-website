@@ -484,14 +484,65 @@ const AdminPage = () => {
         }
 
         .admin-header {
-          text-align: center;
           margin-bottom: 3rem;
+          background: white;
+          padding: 2rem;
+          border-radius: 15px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .header-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
         }
 
         .admin-header h1 {
           color: var(--primary-blue);
           font-size: 2.5rem;
-          margin-bottom: 1rem;
+          margin-bottom: 0.5rem;
+        }
+
+        .admin-user-info {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .user-details {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+        }
+
+        .welcome-text {
+          font-weight: 600;
+          color: var(--text-dark);
+        }
+
+        .user-role {
+          font-size: 0.8rem;
+          color: var(--text-medium);
+          text-transform: capitalize;
+        }
+
+        .logout-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.75rem 1.5rem;
+          background: var(--primary-blue);
+          color: white;
+          border: none;
+          border-radius: 25px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+          background: var(--secondary-green);
+          transform: translateY(-2px);
         }
 
         .admin-loading {
