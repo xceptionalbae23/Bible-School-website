@@ -16,10 +16,72 @@ const AdminPage = () => {
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
   useEffect(() => {
-    fetchDashboardData();
-    fetchRegistrations();
-    fetchPartnerships();
+    checkAuthentication();
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchDashboardData();
+      fetchRegistrations();
+      fetchPartnerships();
+    }
+  }, [isAuthenticated]);
+
+  const checkAuthentication = async () => {
+    const token = localStorage.getItem('admin_token');
+    const storedAdminInfo = localStorage.getItem('admin_info');
+    
+    if (token && storedAdminInfo) {
+      try {
+        // Verify token with backend
+        const response = await fetch(`${backendUrl}/api/admin/verify-token`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          setIsAuthenticated(true);
+          setAdminInfo(JSON.parse(storedAdminInfo));
+        } else {
+          // Token invalid, clear storage
+          localStorage.removeItem('admin_token');
+          localStorage.removeItem('admin_info');
+        }
+      } catch (error) {
+        console.error('Token verification failed:', error);
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_info');
+      }
+    }
+    setLoading(false);
+  };
+
+  const handleLoginSuccess = (loginResult) => {
+    setIsAuthenticated(true);
+    setAdminInfo(loginResult.admin_info);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_info');
+    setIsAuthenticated(false);
+    setAdminInfo(null);
+    setDashboardData(null);
+    setRegistrations([]);
+    setPartnerships([]);
+    toast.success('Logged out successfully');
+  };
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('admin_token');
+    return {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    };
+  };
 
   const fetchDashboardData = async () => {
     try {
