@@ -26,6 +26,8 @@ function App() {
             <Route path="/admissions" element={<AdmissionsPage />} />
             <Route path="/partnership" element={<PartnershipPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/gallery" element={<GalleryPage />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Routes>
         </main>
         <Footer />
