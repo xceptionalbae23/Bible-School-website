@@ -85,9 +85,15 @@ const AdminPage = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await fetch(`${backendUrl}/api/admin/dashboard`);
-      const data = await response.json();
-      setDashboardData(data);
+      const response = await fetch(`${backendUrl}/api/admin/dashboard`, {
+        headers: getAuthHeaders(),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setDashboardData(data);
+      } else if (response.status === 401) {
+        handleLogout();
+      }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     }
@@ -95,9 +101,15 @@ const AdminPage = () => {
 
   const fetchRegistrations = async () => {
     try {
-      const response = await fetch(`${backendUrl}/api/registrations`);
-      const data = await response.json();
-      setRegistrations(data);
+      const response = await fetch(`${backendUrl}/api/registrations`, {
+        headers: getAuthHeaders(),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setRegistrations(data);
+      } else if (response.status === 401) {
+        handleLogout();
+      }
     } catch (error) {
       console.error('Error fetching registrations:', error);
     } finally {
@@ -107,9 +119,15 @@ const AdminPage = () => {
 
   const fetchPartnerships = async () => {
     try {
-      const response = await fetch(`${backendUrl}/api/partnerships`);
-      const data = await response.json();
-      setPartnerships(data);
+      const response = await fetch(`${backendUrl}/api/partnerships`, {
+        headers: getAuthHeaders(),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPartnerships(data);
+      } else if (response.status === 401) {
+        handleLogout();
+      }
     } catch (error) {
       console.error('Error fetching partnerships:', error);
     }
