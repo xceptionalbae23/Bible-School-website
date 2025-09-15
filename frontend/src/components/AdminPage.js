@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Handshake, Images, Calendar, Download, Mail, Phone, MapPin, FileText, Eye, ChevronDown, ChevronUp, LogOut } from 'lucide-react';
 import AdminLogin from './AdminLogin';
+import AdminGallery from './AdminGallery';
 import { toast } from 'sonner';
 
 const AdminPage = () => {
