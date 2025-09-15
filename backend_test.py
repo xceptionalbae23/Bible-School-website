@@ -296,13 +296,27 @@ class WHIBCAPITester:
         )
         return success
 
-    def test_admin_dashboard(self):
-        """Test admin dashboard endpoint"""
-        success, response = self.run_test(
-            "Admin Dashboard",
+    def test_admin_dashboard_unauthorized(self):
+        """Test admin dashboard endpoint without auth (should fail)"""
+        return self.run_test(
+            "Admin Dashboard (Unauthorized)",
             "GET",
             "api/admin/dashboard",
-            200
+            401  # Should be unauthorized
+        )
+
+    def test_admin_dashboard_authorized(self):
+        """Test admin dashboard endpoint with auth"""
+        if not self.admin_token:
+            print("❌ No admin token available for authorized test")
+            return False
+            
+        success, response = self.run_test(
+            "Admin Dashboard (Authorized)",
+            "GET",
+            "api/admin/dashboard",
+            200,
+            auth_required=True
         )
         
         if success and response:
