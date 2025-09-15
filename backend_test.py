@@ -10,6 +10,8 @@ class WHIBCAPITester:
         self.tests_run = 0
         self.tests_passed = 0
         self.admin_token = None
+        self.uploaded_image_filename = None
+        self.graduation_image_filename = None
 
     def run_test(self, name, method, endpoint, expected_status, data=None, files=None, auth_required=False):
         """Run a single API test"""
