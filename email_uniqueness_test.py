@@ -267,6 +267,8 @@ def main():
     
     # Check email availability for new email
     success5, _ = tester.test_email_availability_check_new_email()
+    # Override the email for this specific test
+    partnership_test_email = f"partner.duplicate.{datetime.now().strftime('%Y%m%d%H%M%S')}@example.com"
     
     if success5:
         # Submit partnership with unique email (should succeed)
