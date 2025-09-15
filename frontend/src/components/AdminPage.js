@@ -872,6 +872,21 @@ const AdminPage = () => {
             font-size: 2rem;
           }
 
+          .header-content {
+            flex-direction: column;
+            gap: 1.5rem;
+            text-align: center;
+          }
+
+          .admin-user-info {
+            flex-direction: column;
+            gap: 0.5rem;
+          }
+
+          .user-details {
+            align-items: center;
+          }
+
           .admin-nav {
             flex-direction: column;
             align-items: center;
