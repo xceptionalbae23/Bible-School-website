@@ -1,6 +1,7 @@
 import requests
 import sys
 import json
+import io
 from datetime import datetime
 
 class WHIBCAPITester:
@@ -9,10 +10,14 @@ class WHIBCAPITester:
         self.tests_run = 0
         self.tests_passed = 0
 
-    def run_test(self, name, method, endpoint, expected_status, data=None):
+    def run_test(self, name, method, endpoint, expected_status, data=None, files=None):
         """Run a single API test"""
         url = f"{self.base_url}/{endpoint}"
-        headers = {'Content-Type': 'application/json'}
+        headers = {}
+        
+        # Don't set Content-Type for multipart/form-data (files)
+        if not files:
+            headers['Content-Type'] = 'application/json'
 
         self.tests_run += 1
         print(f"\n🔍 Testing {name}...")
@@ -20,9 +25,14 @@ class WHIBCAPITester:
         
         try:
             if method == 'GET':
-                response = requests.get(url, headers=headers, timeout=10)
+                response = requests.get(url, headers=headers, timeout=15)
             elif method == 'POST':
-                response = requests.post(url, json=data, headers=headers, timeout=10)
+                if files:
+                    # For form data with files
+                    response = requests.post(url, data=data, files=files, timeout=15)
+                else:
+                    # For JSON data
+                    response = requests.post(url, json=data, headers=headers, timeout=15)
 
             print(f"Response Status: {response.status_code}")
             
