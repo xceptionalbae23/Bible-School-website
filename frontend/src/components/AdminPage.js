@@ -318,6 +318,21 @@ const AdminPage = () => {
     );
   };
 
+  // Show login page if not authenticated
+  if (!isAuthenticated) {
+    if (loading) {
+      return (
+        <div className="admin-page">
+          <div className="admin-loading">
+            <div className="loading-spinner"></div>
+            <p>Checking authentication...</p>
+          </div>
+        </div>
+      );
+    }
+    return <AdminLogin onLoginSuccess={handleLoginSuccess} />;
+  }
+
   if (loading) {
     return (
       <div className="admin-page">
@@ -332,8 +347,22 @@ const AdminPage = () => {
   return (
     <div className="admin-page">
       <div className="admin-header">
-        <h1>WHIBC Admin Dashboard</h1>
-        <p>Manage registrations, partnerships, and institutional data</p>
+        <div className="header-content">
+          <div>
+            <h1>WHIBC Admin Dashboard</h1>
+            <p>Manage registrations, partnerships, and institutional data</p>
+          </div>
+          <div className="admin-user-info">
+            <div className="user-details">
+              <span className="welcome-text">Welcome, {adminInfo?.username}</span>
+              <span className="user-role">{adminInfo?.role}</span>
+            </div>
+            <button className="logout-btn" onClick={handleLogout}>
+              <LogOut size={18} />
+              Logout
+            </button>
+          </div>
+        </div>
       </div>
 
       <nav className="admin-nav">
