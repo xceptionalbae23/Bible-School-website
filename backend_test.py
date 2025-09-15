@@ -74,7 +74,7 @@ class WHIBCAPITester:
         )
 
     def test_student_registration(self):
-        """Test student registration endpoint"""
+        """Test student registration endpoint with form data"""
         test_data = {
             "full_name": "John Doe Test",
             "date_of_birth": "1990-01-15",
@@ -95,8 +95,35 @@ class WHIBCAPITester:
             data=test_data
         )
 
+    def test_student_registration_with_file(self):
+        """Test student registration with file upload"""
+        test_data = {
+            "full_name": "Jane Doe Test",
+            "date_of_birth": "1992-05-20",
+            "gender": "Female",
+            "address": "456 Test Avenue, Test City, Test Country",
+            "email": "jane.doe.test@example.com",
+            "phone_number": "+1234567891",
+            "educational_background": "Bachelor's Degree in Biblical Studies",
+            "program_applied": "Master of Theology",
+            "study_mode": "Hybrid"
+        }
+        
+        # Create a test PDF file
+        test_file_content = b"%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 612 792]\n>>\nendobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000074 00000 n \n0000000120 00000 n \ntrailer\n<<\n/Size 4\n/Root 1 0 R\n>>\nstartxref\n179\n%%EOF"
+        files = {'document': ('test_document.pdf', io.BytesIO(test_file_content), 'application/pdf')}
+        
+        return self.run_test(
+            "Student Registration with File",
+            "POST",
+            "api/register-student",
+            200,
+            data=test_data,
+            files=files
+        )
+
     def test_partnership_submission(self):
-        """Test partnership submission endpoint"""
+        """Test partnership submission endpoint with form data"""
         test_data = {
             "organization_name": "Test Christian Organization",
             "contact_person": "Jane Smith",
@@ -112,6 +139,30 @@ class WHIBCAPITester:
             "api/submit-partnership",
             200,
             data=test_data
+        )
+
+    def test_partnership_submission_with_file(self):
+        """Test partnership submission with file upload"""
+        test_data = {
+            "organization_name": "Test Ministry Partners",
+            "contact_person": "John Smith",
+            "email": "john.smith@testministry.com",
+            "phone_number": "+1987654322",
+            "partnership_type": "Ministry Partnership",
+            "message": "We would like to explore ministry partnership opportunities with WHIBC."
+        }
+        
+        # Create a test Word document
+        test_file_content = b"PK\x03\x04\x14\x00\x00\x00\x08\x00Test Word Document Content"
+        files = {'document': ('partnership_proposal.docx', io.BytesIO(test_file_content), 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')}
+        
+        return self.run_test(
+            "Partnership Submission with File",
+            "POST",
+            "api/submit-partnership",
+            200,
+            data=test_data,
+            files=files
         )
 
     def test_get_registrations(self):
