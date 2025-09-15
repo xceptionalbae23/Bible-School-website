@@ -608,7 +608,14 @@ def main():
     tester.test_partnership_submission_with_file()
     
     # Gallery tests
-    tester.test_gallery_endpoints()
+    print("\n📸 Testing Gallery Management...")
+    tester.test_gallery_get_public()
+    tester.test_gallery_upload_unauthorized()
+    tester.test_gallery_upload_authorized()
+    tester.test_gallery_upload_graduation_category()
+    tester.test_gallery_delete_unauthorized()
+    tester.test_gallery_delete_nonexistent()
+    tester.test_gallery_delete_authorized()  # This should be last as it deletes images
     
     # Error handling tests
     tester.test_invalid_registration()
