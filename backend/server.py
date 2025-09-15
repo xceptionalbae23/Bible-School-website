@@ -541,6 +541,34 @@ async def get_gallery():
         logging.error(f"Get gallery error: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch gallery")
 
+@api_router.delete("/gallery/{image_id}")
+async def delete_gallery_image(image_id: str, current_user: str = Depends(verify_token)):
+    """Delete image from gallery (admin only)"""
+    try:
+        # Find the image in database
+        image = await db.gallery.find_one({"id": image_id})
+        if not image:
+            raise HTTPException(status_code=404, detail="Image not found")
+        
+        # Delete file from filesystem if it exists
+        if image.get('filename'):
+            file_path = UPLOAD_DIR / image['filename']
+            if file_path.exists():
+                file_path.unlink()
+                logging.info(f"Deleted file: {file_path}")
+        
+        # Delete from database
+        result = await db.gallery.delete_one({"id": image_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Image not found")
+        
+        return {"status": "success", "message": "Image deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Gallery delete error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete image")
+
 @api_router.get("/admin/dashboard")
 async def admin_dashboard(current_user: str = Depends(verify_token)):
     """Get admin dashboard data"""
