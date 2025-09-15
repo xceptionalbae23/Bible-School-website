@@ -31,6 +31,7 @@ class WHIBCAPITester:
         print(f"URL: {url}")
         
         try:
+            response = None
             if method == 'GET':
                 response = requests.get(url, headers=headers, timeout=15)
             elif method == 'POST':
@@ -40,6 +41,8 @@ class WHIBCAPITester:
                 else:
                     # For JSON data
                     response = requests.post(url, json=data, headers=headers, timeout=15)
+            elif method == 'DELETE':
+                response = requests.delete(url, headers=headers, timeout=15)
 
             print(f"Response Status: {response.status_code}")
             
