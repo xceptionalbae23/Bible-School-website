@@ -364,16 +364,31 @@ def main():
     tester.test_health_endpoint()
     tester.test_api_root()
     
+    # Admin Authentication Tests
+    print("\n🔐 Testing Admin Authentication...")
+    tester.test_admin_login_invalid()  # Test invalid credentials first
+    tester.test_admin_login_valid()    # Get valid token
+    tester.test_admin_login_superadmin()  # Test superadmin
+    tester.test_verify_admin_token()   # Verify token works
+    
+    # Test protected endpoints without auth (should fail)
+    print("\n🚫 Testing Protected Endpoints Without Auth...")
+    tester.test_get_registrations_unauthorized()
+    tester.test_get_partnerships_unauthorized()
+    tester.test_admin_dashboard_unauthorized()
+    
+    # Test protected endpoints with auth (should succeed)
+    print("\n✅ Testing Protected Endpoints With Auth...")
+    tester.test_get_registrations_authorized()
+    tester.test_get_partnerships_authorized()
+    tester.test_admin_dashboard_authorized()
+    
     # Core functionality tests
+    print("\n📝 Testing Core Functionality...")
     tester.test_student_registration()
     tester.test_student_registration_with_file()
     tester.test_partnership_submission()
     tester.test_partnership_submission_with_file()
-    
-    # Admin endpoint tests
-    tester.test_get_registrations()
-    tester.test_get_partnerships()
-    tester.test_admin_dashboard()
     
     # Gallery tests
     tester.test_gallery_endpoints()
