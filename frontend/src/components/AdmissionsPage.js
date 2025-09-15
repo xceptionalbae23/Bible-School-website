@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { GraduationCap, User, Mail, Phone, MapPin, Calendar, BookOpen, CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { GraduationCap, User, Mail, Phone, MapPin, Calendar, BookOpen, CheckCircle, AlertCircle, Loader, Upload, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 
 const AdmissionsPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const {
     register,
@@ -42,18 +43,47 @@ const AdmissionsPage = () => {
     'Hybrid'
   ];
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('File size must be less than 10MB');
+        return;
+      }
+      
+      // Check file type
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('Please upload PDF, Word document, or image files only');
+        return;
+      }
+      
+      setSelectedFile(file);
+    }
+  };
+
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     setSubmitStatus(null);
 
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL;
+      
+      // Create FormData for file upload
+      const formData = new FormData();
+      Object.keys(data).forEach(key => {
+        formData.append(key, data[key]);
+      });
+      
+      // Add file if selected
+      if (selectedFile) {
+        formData.append('document', selectedFile);
+      }
+
       const response = await fetch(`${backendUrl}/api/register-student`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        body: formData, // Don't set Content-Type header for FormData
       });
 
       const result = await response.json();
@@ -65,6 +95,10 @@ const AdmissionsPage = () => {
         });
         toast.success('Registration submitted successfully! Check your email for confirmation.');
         reset();
+        setSelectedFile(null);
+        // Reset file input
+        const fileInput = document.getElementById('document-upload');
+        if (fileInput) fileInput.value = '';
       } else {
         throw new Error(result.detail || 'Registration failed');
       }
@@ -96,13 +130,13 @@ const AdmissionsPage = () => {
     },
     {
       number: 2,
-      title: 'Email Confirmation',
-      description: 'Receive confirmation email with next steps and requirements'
+      title: 'Upload Documents',
+      description: 'Upload required documents (transcripts, certificates, ID)'
     },
     {
       number: 3,
-      title: 'Document Submission',
-      description: 'Submit required documents as outlined in confirmation email'
+      title: 'Email Confirmation',
+      description: 'Receive confirmation email with next steps and requirements'
     },
     {
       number: 4,
@@ -331,6 +365,54 @@ const AdmissionsPage = () => {
                         <span className="error-message">{errors.study_mode.message}</span>
                       )}
                     </div>
+                  </div>
+                </div>
+
+                {/* Document Upload */}
+                <div className="form-section">
+                  <h3 className="form-section-title">
+                    <FileText className="w-5 h-5" />
+                    Document Upload
+                  </h3>
+
+                  <div className="form-group">
+                    <label className="form-label">Supporting Documents (Optional)</label>
+                    <div className="file-upload-container">
+                      <input
+                        type="file"
+                        id="document-upload"
+                        className="file-input"
+                        onChange={handleFileChange}
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      />
+                      <label htmlFor="document-upload" className="file-upload-label">
+                        <Upload className="w-5 h-5" />
+                        <span>Click to upload documents</span>
+                        <span className="file-info">PDF, Word, or Image files (max 10MB)</span>
+                      </label>
+                    </div>
+                    
+                    {selectedFile && (
+                      <div className="selected-file">
+                        <FileText className="w-4 h-4" />
+                        <span>{selectedFile.name}</span>
+                        <span className="file-size">({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedFile(null);
+                            document.getElementById('document-upload').value = '';
+                          }}
+                          className="remove-file-btn"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
+                    
+                    <p className="file-help-text">
+                      Upload academic transcripts, certificates, or identification documents to support your application.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -607,6 +689,82 @@ const AdmissionsPage = () => {
         .form-textarea {
           resize: vertical;
           min-height: 100px;
+        }
+
+        .file-upload-container {
+          position: relative;
+        }
+
+        .file-input {
+          position: absolute;
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        .file-upload-label {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          padding: 2rem;
+          border: 2px dashed var(--gray-300);
+          border-radius: 10px;
+          background: white;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          color: var(--text-medium);
+        }
+
+        .file-upload-label:hover {
+          border-color: var(--primary-blue);
+          background: var(--light-blue);
+          color: var(--primary-blue);
+        }
+
+        .file-info {
+          font-size: 0.8rem;
+          color: var(--text-light);
+        }
+
+        .selected-file {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.75rem;
+          background: var(--light-blue);
+          border-radius: 8px;
+          margin-top: 1rem;
+          color: var(--primary-blue);
+        }
+
+        .file-size {
+          color: var(--text-light);
+          font-size: 0.8rem;
+        }
+
+        .remove-file-btn {
+          margin-left: auto;
+          background: none;
+          border: none;
+          color: var(--text-light);
+          cursor: pointer;
+          font-size: 1.2rem;
+          padding: 0.25rem;
+          border-radius: 3px;
+          transition: all 0.3s ease;
+        }
+
+        .remove-file-btn:hover {
+          background: rgba(255, 0, 0, 0.1);
+          color: red;
+        }
+
+        .file-help-text {
+          font-size: 0.85rem;
+          color: var(--text-light);
+          margin-top: 0.5rem;
+          line-height: 1.4;
         }
 
         .error-message {
