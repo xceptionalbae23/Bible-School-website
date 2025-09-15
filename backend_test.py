@@ -249,11 +249,17 @@ def main():
     
     # Core functionality tests
     tester.test_student_registration()
+    tester.test_student_registration_with_file()
     tester.test_partnership_submission()
+    tester.test_partnership_submission_with_file()
     
     # Admin endpoint tests
     tester.test_get_registrations()
     tester.test_get_partnerships()
+    tester.test_admin_dashboard()
+    
+    # Gallery tests
+    tester.test_gallery_endpoints()
     
     # Error handling tests
     tester.test_invalid_registration()
