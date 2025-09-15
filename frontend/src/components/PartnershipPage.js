@@ -27,18 +27,49 @@ const PartnershipPage = () => {
     'General Partnership'
   ];
 
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('File size must be less than 10MB');
+        return;
+      }
+      
+      // Check file type
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('Please upload PDF, Word document, or image files only');
+        return;
+      }
+      
+      setSelectedFile(file);
+    }
+  };
+
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     setSubmitStatus(null);
 
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL;
+      
+      // Create FormData for file upload
+      const formData = new FormData();
+      Object.keys(data).forEach(key => {
+        formData.append(key, data[key]);
+      });
+      
+      // Add file if selected
+      if (selectedFile) {
+        formData.append('document', selectedFile);
+      }
+
       const response = await fetch(`${backendUrl}/api/submit-partnership`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        body: formData, // Don't set Content-Type header for FormData
       });
 
       const result = await response.json();
