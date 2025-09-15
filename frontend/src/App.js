@@ -7,6 +7,8 @@ import ProgramsPage from "./components/ProgramsPage";
 import AdmissionsPage from "./components/AdmissionsPage";
 import PartnershipPage from "./components/PartnershipPage";
 import ContactPage from "./components/ContactPage";
+import GalleryPage from "./components/GalleryPage";
+import AdminPage from "./components/AdminPage";
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
 import { Toaster } from "./components/ui/sonner";
