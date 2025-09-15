@@ -286,15 +286,232 @@ class WHIBCAPITester:
             auth_required=True
         )
 
-    def test_gallery_endpoints(self):
-        """Test gallery endpoints"""
+    def test_gallery_get_public(self):
+        """Test public gallery endpoint"""
         success, response = self.run_test(
-            "Get Gallery Images",
+            "Get Gallery Images (Public)",
             "GET",
             "api/gallery",
             200
         )
+        
+        if success and response:
+            print(f"📸 Found {len(response)} gallery images")
+            for img in response[:3]:  # Show first 3 images
+                print(f"  - {img.get('title', 'No title')} ({img.get('category', 'No category')})")
+        
         return success
+
+    def test_gallery_upload_unauthorized(self):
+        """Test gallery upload without auth (should fail)"""
+        test_data = {
+            "title": "Test Image",
+            "description": "Test Description",
+            "category": "events"
+        }
+        
+        # Create a test image file
+        test_image_content = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\tpHYs\x00\x00\x0b\x13\x00\x00\x0b\x13\x01\x00\x9a\x9c\x18\x00\x00\x00\x12IDATx\x9cc```bPPP\x00\x02\xac\x01\x00\x00\x05\x00\x01\r\n-\xdb\x00\x00\x00\x00IEND\xaeB`\x82'
+        files = {'image': ('test_image.png', io.BytesIO(test_image_content), 'image/png')}
+        
+        return self.run_test(
+            "Gallery Upload (Unauthorized)",
+            "POST",
+            "api/gallery/upload",
+            401,  # Should be unauthorized
+            data=test_data,
+            files=files
+        )
+
+    def test_gallery_upload_authorized(self):
+        """Test gallery upload with auth"""
+        if not self.admin_token:
+            print("❌ No admin token available for gallery upload test")
+            return False
+        
+        test_data = {
+            "title": "WHIBC Academic Excellence Event",
+            "description": "Students and faculty celebrating academic achievements at Word of Hope International Bible College",
+            "category": "events"
+        }
+        
+        # Create a test image file (small PNG)
+        test_image_content = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\tpHYs\x00\x00\x0b\x13\x00\x00\x0b\x13\x01\x00\x9a\x9c\x18\x00\x00\x00\x12IDATx\x9cc```bPPP\x00\x02\xac\x01\x00\x00\x05\x00\x01\r\n-\xdb\x00\x00\x00\x00IEND\xaeB`\x82'
+        files = {'image': ('test_academic_event.png', io.BytesIO(test_image_content), 'image/png')}
+        
+        # Add authorization header manually for multipart form data
+        headers = {'Authorization': f'Bearer {self.admin_token}'}
+        
+        url = f"{self.base_url}/api/gallery/upload"
+        self.tests_run += 1
+        print(f"\n🔍 Testing Gallery Upload (Authorized)...")
+        print(f"URL: {url}")
+        
+        try:
+            response = requests.post(url, data=test_data, files=files, headers=headers, timeout=15)
+            print(f"Response Status: {response.status_code}")
+            
+            success = response.status_code == 200
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                try:
+                    response_data = response.json()
+                    print(f"Response: {json.dumps(response_data, indent=2)}")
+                    # Store the filename for deletion test
+                    self.uploaded_image_filename = response_data.get('filename')
+                    print(f"📸 Uploaded image filename: {self.uploaded_image_filename}")
+                except:
+                    print(f"Response Text: {response.text[:200]}...")
+            else:
+                print(f"❌ Failed - Expected 200, got {response.status_code}")
+                print(f"Response: {response.text[:500]}...")
+            
+            return success
+            
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            return False
+
+    def test_gallery_upload_graduation_category(self):
+        """Test gallery upload with graduation category"""
+        if not self.admin_token:
+            print("❌ No admin token available for gallery upload test")
+            return False
+        
+        test_data = {
+            "title": "WHIBC Convocation Ceremony",
+            "description": "Annual convocation ceremony celebrating our graduates",
+            "category": "graduation"
+        }
+        
+        # Create a test image file
+        test_image_content = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\tpHYs\x00\x00\x0b\x13\x00\x00\x0b\x13\x01\x00\x9a\x9c\x18\x00\x00\x00\x12IDATx\x9cc```bPPP\x00\x02\xac\x01\x00\x00\x05\x00\x01\r\n-\xdb\x00\x00\x00\x00IEND\xaeB`\x82'
+        files = {'image': ('convocation_ceremony.png', io.BytesIO(test_image_content), 'image/png')}
+        
+        # Add authorization header manually for multipart form data
+        headers = {'Authorization': f'Bearer {self.admin_token}'}
+        
+        url = f"{self.base_url}/api/gallery/upload"
+        self.tests_run += 1
+        print(f"\n🔍 Testing Gallery Upload (Graduation Category)...")
+        print(f"URL: {url}")
+        
+        try:
+            response = requests.post(url, data=test_data, files=files, headers=headers, timeout=15)
+            print(f"Response Status: {response.status_code}")
+            
+            success = response.status_code == 200
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                try:
+                    response_data = response.json()
+                    print(f"Response: {json.dumps(response_data, indent=2)}")
+                    # Store the image ID for deletion test
+                    self.graduation_image_filename = response_data.get('filename')
+                    print(f"📸 Uploaded graduation image filename: {self.graduation_image_filename}")
+                except:
+                    print(f"Response Text: {response.text[:200]}...")
+            else:
+                print(f"❌ Failed - Expected 200, got {response.status_code}")
+                print(f"Response: {response.text[:500]}...")
+            
+            return success
+            
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            return False
+
+    def test_gallery_delete_unauthorized(self):
+        """Test gallery delete without auth (should fail)"""
+        # Use a dummy image ID
+        dummy_image_id = "test-image-id-123"
+        
+        return self.run_test(
+            "Gallery Delete (Unauthorized)",
+            "DELETE",
+            f"api/gallery/{dummy_image_id}",
+            401  # Should be unauthorized
+        )
+
+    def test_gallery_delete_authorized(self):
+        """Test gallery delete with auth"""
+        if not self.admin_token:
+            print("❌ No admin token available for gallery delete test")
+            return False
+        
+        # First, get all gallery images to find one to delete
+        success, response = self.run_test(
+            "Get Gallery Images for Deletion Test",
+            "GET",
+            "api/gallery",
+            200
+        )
+        
+        if not success or not response:
+            print("❌ Could not get gallery images for deletion test")
+            return False
+        
+        if len(response) == 0:
+            print("⚠️ No gallery images found to delete")
+            return True  # Not a failure, just no images to delete
+        
+        # Get the first image ID
+        image_to_delete = response[0]
+        image_id = image_to_delete.get('id')
+        image_title = image_to_delete.get('title', 'Unknown')
+        
+        if not image_id:
+            print("❌ No image ID found in gallery response")
+            return False
+        
+        print(f"🗑️ Attempting to delete image: {image_title} (ID: {image_id})")
+        
+        success, delete_response = self.run_test(
+            f"Gallery Delete (Authorized) - {image_title}",
+            "DELETE",
+            f"api/gallery/{image_id}",
+            200,
+            auth_required=True
+        )
+        
+        if success:
+            print(f"✅ Successfully deleted image: {image_title}")
+            
+            # Verify the image is actually deleted by checking gallery again
+            verify_success, verify_response = self.run_test(
+                "Verify Image Deletion",
+                "GET",
+                "api/gallery",
+                200
+            )
+            
+            if verify_success and verify_response:
+                # Check if the deleted image is no longer in the list
+                remaining_ids = [img.get('id') for img in verify_response]
+                if image_id not in remaining_ids:
+                    print(f"✅ Confirmed: Image {image_id} is no longer in gallery")
+                else:
+                    print(f"⚠️ Warning: Image {image_id} still appears in gallery after deletion")
+        
+        return success
+
+    def test_gallery_delete_nonexistent(self):
+        """Test deleting non-existent gallery image"""
+        if not self.admin_token:
+            print("❌ No admin token available for gallery delete test")
+            return False
+        
+        nonexistent_id = "nonexistent-image-id-12345"
+        
+        return self.run_test(
+            "Gallery Delete (Non-existent Image)",
+            "DELETE",
+            f"api/gallery/{nonexistent_id}",
+            404,  # Should return not found
+            auth_required=True
+        )
 
     def test_admin_dashboard_unauthorized(self):
         """Test admin dashboard endpoint without auth (should fail)"""
