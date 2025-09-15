@@ -550,6 +550,23 @@ async def admin_dashboard(current_user: str = Depends(verify_token)):
         logging.error(f"Admin dashboard error: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch dashboard data")
 
+@api_router.get("/check-email/{email}")
+async def check_email_availability(email: EmailStr):
+    """Check if email is already registered"""
+    try:
+        student_exists = await db.student_registrations.find_one({"email": email})
+        partnership_exists = await db.partnerships.find_one({"email": email})
+        
+        return {
+            "email": email,
+            "available": not (student_exists or partnership_exists),
+            "student_registered": bool(student_exists),
+            "partnership_registered": bool(partnership_exists)
+        }
+    except Exception as e:
+        logging.error(f"Email check error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to check email availability")
+
 @api_router.get("/health")
 async def health_check():
     return {"status": "healthy", "service": "whibc-api"}
