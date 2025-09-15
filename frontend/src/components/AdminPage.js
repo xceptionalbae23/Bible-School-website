@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Handshake, Images, Calendar, Download, Mail, Phone, MapPin, FileText, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import { Users, Handshake, Images, Calendar, Download, Mail, Phone, MapPin, FileText, Eye, ChevronDown, ChevronUp, LogOut } from 'lucide-react';
+import AdminLogin from './AdminLogin';
+import { toast } from 'sonner';
 
 const AdminPage = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [adminInfo, setAdminInfo] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
   const [registrations, setRegistrations] = useState([]);
   const [partnerships, setPartnerships] = useState([]);
