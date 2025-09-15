@@ -388,6 +388,13 @@ const AdminPage = () => {
           <Handshake size={20} />
           Partnerships ({partnerships.length})
         </button>
+        <button 
+          className={`nav-btn ${activeTab === 'gallery' ? 'active' : ''}`}
+          onClick={() => setActiveTab('gallery')}
+        >
+          <Images size={20} />
+          Gallery
+        </button>
       </nav>
 
       <div className="admin-content">
