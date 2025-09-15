@@ -346,6 +346,47 @@ const PartnershipPage = () => {
                       <span className="error-message">{errors.message.message}</span>
                     )}
                   </div>
+
+                  {/* Document Upload */}
+                  <div className="form-group">
+                    <label className="form-label">Supporting Documents (Optional)</label>
+                    <div className="file-upload-container">
+                      <input
+                        type="file"
+                        id="partnership-document-upload"
+                        className="file-input"
+                        onChange={handleFileChange}
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      />
+                      <label htmlFor="partnership-document-upload" className="file-upload-label">
+                        <Upload className="w-5 h-5" />
+                        <span>Click to upload documents</span>
+                        <span className="file-info">PDF, Word, or Image files (max 10MB)</span>
+                      </label>
+                    </div>
+                    
+                    {selectedFile && (
+                      <div className="selected-file">
+                        <FileText className="w-4 h-4" />
+                        <span>{selectedFile.name}</span>
+                        <span className="file-size">({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedFile(null);
+                            document.getElementById('partnership-document-upload').value = '';
+                          }}
+                          className="remove-file-btn"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
+                    
+                    <p className="file-help-text">
+                      Upload partnership proposals, organizational documents, or any supporting materials.
+                    </p>
+                  </div>
                 </div>
               </div>
 
