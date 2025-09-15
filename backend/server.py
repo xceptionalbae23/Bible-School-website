@@ -345,12 +345,20 @@ async def register_student(
 ):
     """Register a new student with optional document upload"""
     try:
-        # Check if email already exists in student registrations
+        # Check if email already exists in student registrations OR partnership applications
         existing_student = await db.student_registrations.find_one({"email": email})
+        existing_partnership = await db.partnerships.find_one({"email": email})
+        
         if existing_student:
             raise HTTPException(
                 status_code=400, 
-                detail=f"A student with email {email} is already registered. Please use a different email address or contact admissions if this is an error."
+                detail=f"Email {email} is already registered as a student. Please use a different email address or contact admissions if this is an error."
+            )
+        
+        if existing_partnership:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Email {email} is already registered for a partnership application. Please use a different email address or contact admissions if this is an error."
             )
         
         # Handle file upload
