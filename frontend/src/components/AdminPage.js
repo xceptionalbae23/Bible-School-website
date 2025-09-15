@@ -482,6 +482,10 @@ const AdminPage = () => {
             </div>
           </div>
         )}
+
+        {activeTab === 'gallery' && (
+          <AdminGallery />
+        )}
       </div>
 
       <style jsx>{`
