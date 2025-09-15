@@ -183,6 +183,39 @@ class WHIBCAPITester:
             200
         )
 
+    def test_gallery_endpoints(self):
+        """Test gallery endpoints"""
+        success, response = self.run_test(
+            "Get Gallery Images",
+            "GET",
+            "api/gallery",
+            200
+        )
+        return success
+
+    def test_admin_dashboard(self):
+        """Test admin dashboard endpoint"""
+        success, response = self.run_test(
+            "Admin Dashboard",
+            "GET",
+            "api/admin/dashboard",
+            200
+        )
+        
+        if success and response:
+            print("📊 Dashboard Stats:")
+            stats = response.get('stats', {})
+            print(f"  - Total Registrations: {stats.get('total_registrations', 'N/A')}")
+            print(f"  - Total Partnerships: {stats.get('total_partnerships', 'N/A')}")
+            print(f"  - Total Gallery Images: {stats.get('total_gallery', 'N/A')}")
+            
+            recent_regs = response.get('recent_registrations', [])
+            recent_parts = response.get('recent_partnerships', [])
+            print(f"  - Recent Registrations: {len(recent_regs)}")
+            print(f"  - Recent Partnerships: {len(recent_parts)}")
+        
+        return success
+
     def test_invalid_registration(self):
         """Test registration with invalid data"""
         invalid_data = {
