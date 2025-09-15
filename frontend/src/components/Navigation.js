@@ -12,6 +12,7 @@ const Navigation = () => {
     { path: '/programs', label: 'Programs' },
     { path: '/admissions', label: 'Admissions' },
     { path: '/partnership', label: 'Partnership' },
+    { path: '/gallery', label: 'Gallery' },
     { path: '/contact', label: 'Contact' }
   ];
 
