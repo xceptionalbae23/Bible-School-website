@@ -420,12 +420,20 @@ async def submit_partnership(
 ):
     """Submit partnership application with optional document upload"""
     try:
-        # Check if email already exists in partnership applications
+        # Check if email already exists in partnership applications OR student registrations
+        existing_student = await db.student_registrations.find_one({"email": email})
         existing_partnership = await db.partnerships.find_one({"email": email})
+        
         if existing_partnership:
             raise HTTPException(
                 status_code=400, 
-                detail=f"A partnership application with email {email} already exists. Please use a different email address or contact us if this is an error."
+                detail=f"Email {email} is already registered for a partnership application. Please use a different email address or contact us if this is an error."
+            )
+        
+        if existing_student:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Email {email} is already registered as a student. Please use a different email address or contact us if this is an error."
             )
         
         # Handle file upload
