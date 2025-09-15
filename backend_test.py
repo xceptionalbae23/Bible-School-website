@@ -240,22 +240,50 @@ class WHIBCAPITester:
             files=files
         )
 
-    def test_get_registrations(self):
-        """Test get registrations endpoint (admin)"""
+    def test_get_registrations_unauthorized(self):
+        """Test get registrations endpoint without auth (should fail)"""
         return self.run_test(
-            "Get Registrations",
+            "Get Registrations (Unauthorized)",
             "GET",
             "api/registrations",
-            200
+            401  # Should be unauthorized
         )
 
-    def test_get_partnerships(self):
-        """Test get partnerships endpoint (admin)"""
+    def test_get_registrations_authorized(self):
+        """Test get registrations endpoint with auth"""
+        if not self.admin_token:
+            print("❌ No admin token available for authorized test")
+            return False
+            
         return self.run_test(
-            "Get Partnerships",
+            "Get Registrations (Authorized)",
+            "GET",
+            "api/registrations",
+            200,
+            auth_required=True
+        )
+
+    def test_get_partnerships_unauthorized(self):
+        """Test get partnerships endpoint without auth (should fail)"""
+        return self.run_test(
+            "Get Partnerships (Unauthorized)",
             "GET",
             "api/partnerships",
-            200
+            401  # Should be unauthorized
+        )
+
+    def test_get_partnerships_authorized(self):
+        """Test get partnerships endpoint with auth"""
+        if not self.admin_token:
+            print("❌ No admin token available for authorized test")
+            return False
+            
+        return self.run_test(
+            "Get Partnerships (Authorized)",
+            "GET",
+            "api/partnerships",
+            200,
+            auth_required=True
         )
 
     def test_gallery_endpoints(self):
