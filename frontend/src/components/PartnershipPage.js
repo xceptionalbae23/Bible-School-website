@@ -81,6 +81,10 @@ const PartnershipPage = () => {
         });
         toast.success('Partnership application submitted successfully!');
         reset();
+        setSelectedFile(null);
+        // Reset file input
+        const fileInput = document.getElementById('partnership-document-upload');
+        if (fileInput) fileInput.value = '';
       } else {
         throw new Error(result.detail || 'Partnership submission failed');
       }
