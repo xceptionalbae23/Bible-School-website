@@ -11,10 +11,14 @@ class WHIBCAPITester:
         self.tests_passed = 0
         self.admin_token = None
 
-    def run_test(self, name, method, endpoint, expected_status, data=None, files=None):
+    def run_test(self, name, method, endpoint, expected_status, data=None, files=None, auth_required=False):
         """Run a single API test"""
         url = f"{self.base_url}/{endpoint}"
         headers = {}
+        
+        # Add authorization header if required
+        if auth_required and self.admin_token:
+            headers['Authorization'] = f'Bearer {self.admin_token}'
         
         # Don't set Content-Type for multipart/form-data (files)
         if not files:
