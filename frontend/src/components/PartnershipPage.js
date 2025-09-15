@@ -663,6 +663,82 @@ const PartnershipPage = () => {
           cursor: not-allowed;
         }
 
+        .file-upload-container {
+          position: relative;
+        }
+
+        .file-input {
+          position: absolute;
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        .file-upload-label {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          padding: 2rem;
+          border: 2px dashed var(--gray-300);
+          border-radius: 10px;
+          background: white;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          color: var(--text-medium);
+        }
+
+        .file-upload-label:hover {
+          border-color: var(--secondary-green);
+          background: var(--light-green);
+          color: var(--secondary-green);
+        }
+
+        .file-info {
+          font-size: 0.8rem;
+          color: var(--text-light);
+        }
+
+        .selected-file {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.75rem;
+          background: var(--light-green);
+          border-radius: 8px;
+          margin-top: 1rem;
+          color: var(--secondary-green);
+        }
+
+        .file-size {
+          color: var(--text-light);
+          font-size: 0.8rem;
+        }
+
+        .remove-file-btn {
+          margin-left: auto;
+          background: none;
+          border: none;
+          color: var(--text-light);
+          cursor: pointer;
+          font-size: 1.2rem;
+          padding: 0.25rem;
+          border-radius: 3px;
+          transition: all 0.3s ease;
+        }
+
+        .remove-file-btn:hover {
+          background: rgba(255, 0, 0, 0.1);
+          color: red;
+        }
+
+        .file-help-text {
+          font-size: 0.85rem;
+          color: var(--text-light);
+          margin-top: 0.5rem;
+          line-height: 1.4;
+        }
+
         .status-message {
           display: flex;
           align-items: center;
