@@ -662,6 +662,63 @@ const ContactPage = () => {
             align-items: center;
           }
         }
+
+        .social-media-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 2rem;
+          max-width: 1000px;
+          margin: 0 auto;
+        }
+
+        .social-card {
+          text-align: center;
+          transition: all 0.3s ease;
+        }
+
+        .social-card:hover {
+          transform: translateY(-8px);
+        }
+
+        .social-icon {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 1.5rem;
+          color: white;
+        }
+
+        .social-icon.facebook {
+          background: #1877f2;
+        }
+
+        .social-icon.youtube {
+          background: #ff0000;
+        }
+
+        .social-icon.whatsapp {
+          background: #25d366;
+        }
+
+        .social-card h3 {
+          color: var(--primary-blue);
+          margin-bottom: 1rem;
+        }
+
+        .social-card p {
+          color: var(--text-medium);
+          margin-bottom: 2rem;
+          line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+          .social-media-grid {
+            grid-template-columns: 1fr;
+          }
+        }
       `}</style>
     </div>
   );
