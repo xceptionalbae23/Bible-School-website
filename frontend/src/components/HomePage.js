@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { GraduationCap, Users, Award, Globe, BookOpen, Heart, ArrowRight, Phone, Mail, MapPin } from 'lucide-react';
+import { GraduationCap, Users, Award, Globe, BookOpen, Heart, ArrowRight, Phone, Mail, MapPin, Facebook, Youtube } from 'lucide-react';
 
 const HomePage = () => {
   const features = [
