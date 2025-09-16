@@ -507,6 +507,69 @@ const HomePage = () => {
           font-weight: 500;
         }
 
+        .social-media-links {
+          margin-top: 3rem;
+          padding-top: 2rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .social-media-links h3 {
+          color: white;
+          margin-bottom: 1.5rem;
+          font-size: 1.25rem;
+        }
+
+        .social-links {
+          display: flex;
+          justify-content: center;
+          gap: 1.5rem;
+        }
+
+        .social-link {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          color: white;
+          text-decoration: none;
+          transition: all 0.3s ease;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .social-link:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .social-link.facebook {
+          background: #1877f2;
+          border-color: #1877f2;
+        }
+
+        .social-link.youtube {
+          background: #ff0000;
+          border-color: #ff0000;
+        }
+
+        .social-link.whatsapp {
+          background: #25d366;
+          border-color: #25d366;
+        }
+
+        .social-link.facebook:hover {
+          background: #145dbf;
+        }
+
+        .social-link.youtube:hover {
+          background: #cc0000;
+        }
+
+        .social-link.whatsapp:hover {
+          background: #1da851;
+        }
+
         @keyframes pulse {
           0%, 100% {
             transform: scale(1);
