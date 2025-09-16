@@ -238,6 +238,39 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
+
+            <div className="social-media-links">
+              <h3>Follow Us</h3>
+              <div className="social-links">
+                <a 
+                  href="https://facebook.com/groups/1249228856399823/" 
+                  className="social-link facebook"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook Group"
+                >
+                  <Facebook size={24} />
+                </a>
+                <a 
+                  href="https://youtube.com/@wohiministriesworldwide?si=Fn-_FtPOVtJl-_kO" 
+                  className="social-link youtube"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="YouTube Channel"
+                >
+                  <Youtube size={24} />
+                </a>
+                <a 
+                  href="https://wa.me/2349042520176" 
+                  className="social-link whatsapp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="WhatsApp Contact"
+                >
+                  <Phone size={24} />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
