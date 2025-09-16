@@ -107,13 +107,31 @@ const Footer = () => {
               <p>&copy; {currentYear} Word of Hope International Bible College. All rights reserved.</p>
             </div>
             <div className="footer-social">
-              <a href="#" className="social-link" aria-label="Facebook">
+              <a 
+                href="https://facebook.com/groups/1249228856399823/" 
+                className="social-link" 
+                aria-label="Facebook"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Facebook size={20} />
               </a>
-              <a href="#" className="social-link" aria-label="YouTube">
+              <a 
+                href="https://youtube.com/@wohiministriesworldwide?si=Fn-_FtPOVtJl-_kO" 
+                className="social-link" 
+                aria-label="YouTube"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Youtube size={20} />
               </a>
-              <a href="#" className="social-link" aria-label="WhatsApp">
+              <a 
+                href="https://wa.me/2349042520176" 
+                className="social-link" 
+                aria-label="WhatsApp"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Phone size={20} />
               </a>
             </div>
