@@ -296,6 +296,75 @@ const ContactPage = () => {
         </div>
       </section>
 
+      {/* Social Media Section */}
+      <section className="social-media-section section section-light">
+        <div className="container">
+          <div className="section-header text-center">
+            <h2>Connect With Us</h2>
+            <p>Follow us on social media for updates, events, and inspiration</p>
+          </div>
+
+          <div className="social-media-grid">
+            <div className="social-card card">
+              <div className="card-content text-center">
+                <div className="social-icon facebook">
+                  <Facebook className="w-12 h-12" />
+                </div>
+                <h3>Facebook Group</h3>
+                <p>Join our Facebook community to connect with fellow students, alumni, and faculty.</p>
+                <a 
+                  href="https://facebook.com/groups/1249228856399823/" 
+                  className="btn btn-primary"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Facebook className="w-5 h-5" />
+                  Join Our Group
+                </a>
+              </div>
+            </div>
+
+            <div className="social-card card">
+              <div className="card-content text-center">
+                <div className="social-icon youtube">
+                  <Youtube className="w-12 h-12" />
+                </div>
+                <h3>YouTube Channel</h3>
+                <p>Watch sermons, lectures, testimonials, and campus events on our YouTube channel.</p>
+                <a 
+                  href="https://youtube.com/@wohiministriesworldwide?si=Fn-_FtPOVtJl-_kO" 
+                  className="btn btn-secondary"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Youtube className="w-5 h-5" />
+                  Subscribe Now
+                </a>
+              </div>
+            </div>
+
+            <div className="social-card card">
+              <div className="card-content text-center">
+                <div className="social-icon whatsapp">
+                  <Phone className="w-12 h-12" />
+                </div>
+                <h3>WhatsApp</h3>
+                <p>Get quick responses to your questions through our WhatsApp contact.</p>
+                <a 
+                  href="https://wa.me/2349042520176" 
+                  className="btn btn-outline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Phone className="w-5 h-5" />
+                  Message Us
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="contact-cta">
         <div className="container">
