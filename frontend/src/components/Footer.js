@@ -14,7 +14,7 @@ const Footer = () => {
             <div className="footer-section">
               <div className="footer-brand">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/tock7csa_WhatsApp%20Image%202025-09-13%20at%2008.29.05.jpeg" 
+                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/e7r218wc_WhatsApp%20Image%202025-09-18%20at%2020.48.07.jpeg" 
                   alt="WHIBC Logo" 
                   className="footer-logo"
                 />
