@@ -407,6 +407,36 @@ const AboutPage = () => {
           flex-shrink: 0;
         }
 
+        .contact-info {
+          margin-top: 2rem;
+          padding: 1.5rem;
+          background: var(--light-green);
+          border-radius: 10px;
+          border-left: 4px solid var(--secondary-green);
+        }
+
+        .contact-info h5 {
+          color: var(--secondary-green);
+          margin-bottom: 1rem;
+          font-weight: 600;
+        }
+
+        .contact-info p {
+          color: var(--text-dark);
+          margin-bottom: 0.5rem;
+          font-size: 0.9rem;
+        }
+
+        .leader-bio p {
+          margin-bottom: 1.5rem;
+          line-height: 1.7;
+        }
+
+        .leader-bio p strong {
+          color: var(--primary-blue);
+          font-weight: 600;
+        }
+
         .timeline {
           max-width: 800px;
           margin: 0 auto;
