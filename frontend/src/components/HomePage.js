@@ -55,7 +55,7 @@ const HomePage = () => {
       <section className="hero">
         <div className="hero-background">
           <img 
-            src="https://images.unsplash.com/photo-1626815097810-7e54a9ecad96?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzB8MHwxfHNlYXJjaHwxfHxjaHJpc3RpYW4lMjB1bml2ZXJzaXR5JTIwY2FtcHVzfGVufDB8fHx8MTc1Nzc2MTEzMXww&ixlib=rb-4.1.0&q=85" 
+            src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/xs9o2jk0_WhatsApp%20Image%202025-09-22%20at%2014.47.50.jpeg" 
             alt="WHIBC Campus" 
             className="hero-image"
           />
