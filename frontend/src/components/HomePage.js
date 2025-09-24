@@ -194,14 +194,14 @@ const HomePage = () => {
             <div className="leader-card card">
               <div className="card-content text-center">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/yynai5yu_WhatsApp%20Image%202025-09-13%20at%2011.51.07.jpeg" 
-                  alt="Dr. Lawyer Istwekpeni" 
+                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/auovrnk7_WhatsApp%20Image%202025-09-22%20at%2013.40.27.jpeg" 
+                  alt="Apostle Dr. Lawyer Isiwekpeni Ekpah" 
                   className="leader-image"
                 />
-                <h3>Dr. Lawyer Istwekpeni</h3>
-                <div className="leader-title">Vice President</div>
-                <div className="leader-location">PhD (Nigeria)</div>
-                <p>Overseeing academic excellence and research initiatives, bringing extensive experience in theological education and leadership.</p>
+                <h3>Apostle Dr. Lawyer Isiwekpeni Ekpah</h3>
+                <div className="leader-title">Vice President/Rector (Bishop-Elect)</div>
+                <div className="leader-location">PhD, Nigeria & Canada</div>
+                <p>Former Nigerian Air Force Nurse Medic, renowned theologian, author, and founder of Life Giving Word Mission Inc. Bringing decades of military, medical, and ministerial experience to academic excellence.</p>
               </div>
             </div>
           </div>
