@@ -167,31 +167,68 @@ const AboutPage = () => {
             <div className="leader-profile card">
               <div className="leader-image-container">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/yynai5yu_WhatsApp%20Image%202025-09-13%20at%2011.51.07.jpeg" 
-                  alt="Dr. Lawyer Istwekpeni" 
+                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/auovrnk7_WhatsApp%20Image%202025-09-22%20at%2013.40.27.jpeg" 
+                  alt="Apostle Dr. Lawyer Isiwekpeni Ekpah" 
                   className="leader-image"
                 />
               </div>
               <div className="card-content">
-                <h3>Dr. Lawyer Istwekpeni</h3>
-                <div className="leader-title">Vice President</div>
-                <div className="leader-location">PhD (Nigeria)</div>
+                <h3>Apostle Dr. Lawyer Isiwekpeni Ekpah</h3>
+                <div className="leader-title">Vice President/Rector (Bishop-Elect)</div>
+                <div className="leader-location">PhD, Nigeria & Canada</div>
                 
                 <div className="leader-bio">
                   <p>
-                    Dr. Lawyer Istwekpeni serves as Vice President, bringing extensive academic credentials 
-                    and practical ministry experience. His leadership in academic affairs ensures the 
-                    highest standards of theological education and research excellence.
+                    <strong>Early Life & Salvation:</strong> Born into an Anglican family, Apostle Dr. Lawyer Isiwekpeni Ekpah was transformed in 1997 from chronic unbelief to powerful faith when God revealed Himself personally. Married to Chidinma Bridget Isiwekpeni with four children, he serves as the only surviving son of his father, preserved by God's grace.
+                  </p>
+
+                  <p>
+                    <strong>Military & Medical Service:</strong> Served with honor in the Nigerian Air Force (1996-2021) as a Nurse Medic in various hospitals and international peacekeeping operations in Northern Sudan. While on foreign mission in Engelina, Northern Sudan (2011), he assisted in planting churches and baptizing new believers.
+                  </p>
+
+                  <p>
+                    <strong>Ministry Calling:</strong> Founder and Senior Pastor of Life Giving Word Mission Inc (City of Solution Church, Enugu State, Nigeria) - an international evangelical movement dedicated to preaching the Gospel of Jesus Christ and meeting human needs without discrimination.
                   </p>
                   
                   <div className="leader-highlights">
-                    <h5>Academic Excellence:</h5>
+                    <h5>Academic & Professional Qualifications:</h5>
                     <ul>
-                      <li><CheckCircle size={16} /> PhD in Theological Education</li>
-                      <li><CheckCircle size={16} /> Oversees academic programs and curriculum</li>
-                      <li><CheckCircle size={16} /> Leads research and publication initiatives</li>
-                      <li><CheckCircle size={16} /> Mentors faculty and doctoral candidates</li>
+                      <li><CheckCircle size={16} /> PhD in Theology - Shiloh Spiritual Defence Academy</li>
+                      <li><CheckCircle size={16} /> M.Th. in Theology (2021)</li>
+                      <li><CheckCircle size={16} /> B.A. in Theology - International Christian University, Lagos</li>
+                      <li><CheckCircle size={16} /> Honorary Doctor of Divinity (2022)</li>
+                      <li><CheckCircle size={16} /> Nigerian Army School of Nursing & Midwifery Graduate</li>
+                      <li><CheckCircle size={16} /> UN Diplomas in Peace, Conflict Resolution & Humanitarian Law</li>
                     </ul>
+                  </div>
+
+                  <div className="leader-highlights">
+                    <h5>Ministry & Publications:</h5>
+                    <ul>
+                      <li><CheckCircle size={16} /> Author: "The Secret of a Successful Christian Marriage" (2015)</li>
+                      <li><CheckCircle size={16} /> Writer: "The Voice of Grace Devotional"</li>
+                      <li><CheckCircle size={16} /> Marriage Counselor & Bible School Lecturer</li>
+                      <li><CheckCircle size={16} /> International Minister - ordained worldwide</li>
+                    </ul>
+                  </div>
+
+                  <div className="leader-highlights">
+                    <h5>Ministry Vision & Mission:</h5>
+                    <ul>
+                      <li><CheckCircle size={16} /> Preach the Gospel to all nations</li>
+                      <li><CheckCircle size={16} /> Serve through Medical Mission Outreach</li>
+                      <li><CheckCircle size={16} /> Train, ordain, and license candidates for ministry</li>
+                      <li><CheckCircle size={16} /> Make education accessible through nonprofit institutions</li>
+                      <li><CheckCircle size={16} /> Partner with mission-minded ministries worldwide</li>
+                    </ul>
+                  </div>
+
+                  <div className="contact-info">
+                    <h5>Ministry Contact:</h5>
+                    <p><strong>Email:</strong> lifegivingwordmission@gmail.com</p>
+                    <p><strong>YouTube:</strong> Lifegivingwordmission</p>
+                    <p><strong>Facebook:</strong> Lifegivingwordmission</p>
+                    <p><strong>Mandate:</strong> Matthew 28:19-20 - "Go ye therefore, and teach all nations..."</p>
                   </div>
                 </div>
               </div>
