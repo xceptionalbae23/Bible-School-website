@@ -176,7 +176,7 @@ const HomePage = () => {
             <p>Experienced leaders guiding our academic vision</p>
           </div>
           
-          <div className="grid grid-2">
+          <div className="grid grid-3">
             <div className="leader-card card">
               <div className="card-content text-center">
                 <img 
