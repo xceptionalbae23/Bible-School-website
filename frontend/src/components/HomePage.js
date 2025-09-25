@@ -194,14 +194,70 @@ const HomePage = () => {
             <div className="leader-card card">
               <div className="card-content text-center">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/auovrnk7_WhatsApp%20Image%202025-09-22%20at%2013.40.27.jpeg" 
-                  alt="Apostle Dr. Lawyer Isiwekpeni Ekpah" 
+                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/05ismsdm_WhatsApp%20Image%202025-09-13%20at%2011.51.07.jpeg" 
+                  alt="Dr. Lawyer Isiwekpeni Ekpah" 
                   className="leader-image"
                 />
-                <h3>Apostle Dr. Lawyer Isiwekpeni Ekpah</h3>
-                <div className="leader-title">Vice President/Rector (Bishop-Elect)</div>
-                <div className="leader-location">PhD, Nigeria & Canada</div>
-                <p>Former Nigerian Air Force Nurse Medic, renowned theologian, author, and founder of Life Giving Word Mission Inc. Bringing decades of military, medical, and ministerial experience to academic excellence.</p>
+                <h3>Dr. Lawyer Isiwekpeni Ekpah</h3>
+                <div className="leader-title">Vice President & International Coordinator</div>
+                <div className="leader-location">PhD, Student Affairs</div>
+                <p>Overseeing academic excellence, international programs, and student affairs with extensive theological and military background.</p>
+              </div>
+            </div>
+
+            <div className="leader-card card">
+              <div className="card-content text-center">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/d6ool4lq_WhatsApp%20Image%202025-09-13%20at%2011.49.35.jpeg" 
+                  alt="Mrs. Isiwekpeni Chidinma" 
+                  className="leader-image"
+                />
+                <h3>Mrs. Isiwekpeni Chidinma</h3>
+                <div className="leader-title">Director of Education</div>
+                <div className="leader-location">Nigeria</div>
+                <p>Leading educational programs and curriculum development, ensuring excellence in academic delivery across all programs.</p>
+              </div>
+            </div>
+
+            <div className="leader-card card">
+              <div className="card-content text-center">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/vzia377c_WhatsApp%20Image%202025-09-25%20at%2011.59.14.jpeg" 
+                  alt="Pastor Darlington Okoro" 
+                  className="leader-image"
+                />
+                <h3>Pastor Darlington Okoro</h3>
+                <div className="leader-title">Director of Admissions</div>
+                <div className="leader-location">Nigeria</div>
+                <p>Managing student admissions, enrollment processes, and ensuring smooth onboarding for all new students.</p>
+              </div>
+            </div>
+
+            <div className="leader-card card">
+              <div className="card-content text-center">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/uiyjgsoc_WhatsApp%20Image%202025-09-25%20at%2012.01.19.jpeg" 
+                  alt="Pastor Lambert Iku" 
+                  className="leader-image"
+                />
+                <h3>Pastor Lambert Iku</h3>
+                <div className="leader-title">International Registrar</div>
+                <div className="leader-location">United Kingdom</div>
+                <p>Managing international student records, registrations, and coordinating global academic partnerships.</p>
+              </div>
+            </div>
+
+            <div className="leader-card card">
+              <div className="card-content text-center">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/x2bykhnu_WhatsApp%20Image%202025-09-13%20at%2008.07.06.jpeg" 
+                  alt="David Ross" 
+                  className="leader-image"
+                />
+                <h3>David Ross</h3>
+                <div className="leader-title">Head of Human Resources</div>
+                <div className="leader-location">Canada</div>
+                <p>Managing human resources, staff development, and organizational excellence across all WHIBC operations.</p>
               </div>
             </div>
           </div>
