@@ -5,7 +5,7 @@ import io
 from datetime import datetime
 
 class WHIBCAPITester:
-    def __init__(self, base_url="https://whibc-portal.preview.emergentagent.com"):
+    def __init__(self, base_url="https://bible-institute-web.preview.emergentagent.com"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0
