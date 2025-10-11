@@ -56,7 +56,7 @@ const Navigation = () => {
 
         <button
           className="navbar-burger"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          onClick={() => setIsMenuOpen(prev => !prev)}
           aria-label="Toggle menu"
         >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
