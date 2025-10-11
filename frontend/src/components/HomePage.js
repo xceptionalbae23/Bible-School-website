@@ -168,8 +168,77 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* Upcoming Events Section */}
+      <section className="events-section section">
+        <div className="container">
+          <div className="section-header text-center">
+            <h2>Upcoming Events</h2>
+            <p>Join us for these exciting upcoming events and programs</p>
+          </div>
+          
+          <div className="events-grid">
+            <div className="event-card card">
+              <div className="event-image-container">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/twk1zmgg_WhatsApp%20Image%202025-10-05%20at%2013.26.27.jpeg" 
+                  alt="Upcoming WHIBC Event" 
+                  className="event-image"
+                />
+                <div className="event-badge">Upcoming</div>
+              </div>
+              <div className="card-content">
+                <h4>Special Institutional Program</h4>
+                <p>Join us for this special program featuring academic excellence and character development initiatives.</p>
+                <div className="event-details">
+                  <div className="event-info">
+                    <Calendar size={16} />
+                    <span>Coming Soon</span>
+                  </div>
+                  <div className="event-info">
+                    <MapPin size={16} />
+                    <span>Nigeria & Canada</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="event-card card">
+              <div className="event-image-container">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/uehvcmoy_WhatsApp%20Image%202025-10-08%20at%2005.37.57.jpeg" 
+                  alt="Upcoming WHIBC Event" 
+                  className="event-image"
+                />
+                <div className="event-badge">Upcoming</div>
+              </div>
+              <div className="card-content">
+                <h4>Academic Excellence Celebration</h4>
+                <p>Celebrate our commitment to excellence in academic and character development with the WHIBC community.</p>
+                <div className="event-details">
+                  <div className="event-info">
+                    <Calendar size={16} />
+                    <span>Coming Soon</span>
+                  </div>
+                  <div className="event-info">
+                    <MapPin size={16} />
+                    <span>Nigeria & Canada</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-5">
+            <Link to="/gallery" className="btn btn-outline">
+              View All Events
+              <ArrowRight size={18} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Leadership Section */}
-      <section className="leadership-section section">
+      <section className="leadership-section section section-light">
         <div className="container">
           <div className="section-header text-center">
             <h2>Our Leadership</h2>
