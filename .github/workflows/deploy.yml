@@ -1,4 +1,4 @@
-# Replace the workflow file with the fixed version
+# Update the workflow file
 cat > .github/workflows/deploy.yml << 'EOF'
 name: Deploy React App to GitHub Pages
 
@@ -29,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd frontend
-          npm ci --legacy-peer-deps
+          npm install --legacy-peer-deps --force
 
       - name: Build React app
         run: |
