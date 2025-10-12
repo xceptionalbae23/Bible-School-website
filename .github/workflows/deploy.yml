@@ -24,15 +24,21 @@ jobs:
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install dependencies
+      - name: Install and build with aggressive flags
         run: |
           cd frontend
-          npm install --legacy-peer-deps --force
-
-      - name: Build React app
-        run: |
-          cd frontend
-          CI=false npm run build
+          # Clear any corrupted node_modules
+          rm -rf node_modules
+          rm -f package-lock.json
+          
+          # Install with maximum permissiveness
+          npm install --legacy-peer-deps --force --no-audit --no-fund
+          
+          # Force install specific problematic dependencies
+          npm install ajv@^8.0.0 ajv-keywords@^5.0.0 --legacy-peer-deps --force --no-save
+          
+          # Build with all warnings disabled
+          CI=false GENERATE_SOURCEMAP=false npm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
