@@ -23,7 +23,7 @@ const Navigation = () => {
       <div className="container">
         <Link to="/" className="navbar-brand">
           <img 
-            src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/e7r218wc_WhatsApp%20Image%202025-09-18%20at%2020.48.07.jpeg" 
+            src="/images/logo/main-logo.jpeg" 
             alt="WHIBC Logo" 
             className="logo-img"
           />

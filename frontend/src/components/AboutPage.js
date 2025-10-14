@@ -134,7 +134,7 @@ const AboutPage = () => {
             <div className="leader-profile card">
               <div className="leader-image-container">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/f4xxl94c_WhatsApp%20Image%202025-09-13%20at%2008.07.04.jpeg" 
+                  src="/images/about/about1.jpeg" 
                   alt="Apostle Sandra Ross" 
                   className="leader-image"
                 />
@@ -167,7 +167,7 @@ const AboutPage = () => {
             <div className="leader-profile card">
               <div className="leader-image-container">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/auovrnk7_WhatsApp%20Image%202025-09-22%20at%2013.40.27.jpeg" 
+                  src="/images/about/about2.jpeg" 
                   alt="Apostle Dr. Lawyer Isiwekpeni Ekpah" 
                   className="leader-image"
                 />

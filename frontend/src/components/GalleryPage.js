@@ -15,7 +15,7 @@ const GalleryPage = () => {
       id: 1,
       title: "Upcoming Events & Announcements",
       description: "Information about upcoming academic events, seminars, and important announcements for the WHIBC community.",
-      image: "https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/bfh42jg9_WhatsApp%20Image%202025-09-13%20at%2012.46.11.jpeg",
+      image: "/images/gallery/gallery-featured.jpeg",
       category: "events",
       date: "2025-09-13"
     },

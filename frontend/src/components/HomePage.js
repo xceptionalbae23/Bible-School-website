@@ -55,7 +55,7 @@ const HomePage = () => {
       <section className="hero">
         <div className="hero-background">
           <img 
-            src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/xs9o2jk0_WhatsApp%20Image%202025-09-22%20at%2014.47.50.jpeg" 
+            src="/images/home/hero-image.jpeg" 
             alt="WHIBC Campus" 
             className="hero-image"
           />
@@ -180,7 +180,7 @@ const HomePage = () => {
             <div className="event-card card">
               <div className="event-image-container">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/twk1zmgg_WhatsApp%20Image%202025-10-05%20at%2013.26.27.jpeg" 
+                  src="/images/home/gallery1.jpeg" 
                   alt="Upcoming WHIBC Event" 
                   className="event-image"
                 />
@@ -205,7 +205,7 @@ const HomePage = () => {
             <div className="event-card card">
               <div className="event-image-container">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/uehvcmoy_WhatsApp%20Image%202025-10-08%20at%2005.37.57.jpeg" 
+                  src="/images/home/gallery2.jpeg" 
                   alt="Upcoming WHIBC Event" 
                   className="event-image"
                 />
@@ -249,7 +249,7 @@ const HomePage = () => {
             <div className="leader-card card">
               <div className="card-content text-center">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/f4xxl94c_WhatsApp%20Image%202025-09-13%20at%2008.07.04.jpeg" 
+                  src="/images/home/gallery3.jpeg" 
                   alt="Apostle Sandra Ross" 
                   className="leader-image"
                 />
@@ -263,7 +263,7 @@ const HomePage = () => {
             <div className="leader-card card">
               <div className="card-content text-center">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/05ismsdm_WhatsApp%20Image%202025-09-13%20at%2011.51.07.jpeg" 
+                  src="/images/home/gallery4.jpeg" 
                   alt="Dr. Lawyer Isiwekpeni Ekpah" 
                   className="leader-image"
                 />
@@ -277,7 +277,7 @@ const HomePage = () => {
             <div className="leader-card card">
               <div className="card-content text-center">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/d6ool4lq_WhatsApp%20Image%202025-09-13%20at%2011.49.35.jpeg" 
+                  src="/images/home/gallery5.jpeg" 
                   alt="Mrs. Isiwekpeni Chidinma" 
                   className="leader-image"
                 />
@@ -291,7 +291,7 @@ const HomePage = () => {
             <div className="leader-card card">
               <div className="card-content text-center">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/vzia377c_WhatsApp%20Image%202025-09-25%20at%2011.59.14.jpeg" 
+                  src="/images/home/gallery6.jpeg" 
                   alt="Pastor Darlington Okoro" 
                   className="leader-image"
                 />
@@ -305,7 +305,7 @@ const HomePage = () => {
             <div className="leader-card card">
               <div className="card-content text-center">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/uiyjgsoc_WhatsApp%20Image%202025-09-25%20at%2012.01.19.jpeg" 
+                  src="/images/home/gallery7.jpeg" 
                   alt="Pastor Lambert Iku" 
                   className="leader-image"
                 />
@@ -319,7 +319,7 @@ const HomePage = () => {
             <div className="leader-card card">
               <div className="card-content text-center">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_whibc-portal/artifacts/x2bykhnu_WhatsApp%20Image%202025-09-13%20at%2008.07.06.jpeg" 
+                  src="/images/home/gallery8.jpeg" 
                   alt="David Ross" 
                   className="leader-image"
                 />
