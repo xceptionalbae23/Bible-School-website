@@ -1,4 +1,4 @@
-name: Deploy Static Site
+name: Deploy React App
 
 on:
   push:
@@ -16,6 +16,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Verify React files
+        run: |
+          echo "Checking for React build files..."
+          ls -la index.html
+          ls -la static/js/main.*.js || echo "No React JS files found"
+          ls -la static/css/main.*.css || echo "No React CSS files found"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
