@@ -1,4 +1,4 @@
-name: Deploy Pre-Built React App
+name: Deploy Static Site
 
 on:
   push:
