@@ -1,4 +1,4 @@
-name: Deploy React App
+name: Deploy Pre-Built React App
 
 on:
   push:
@@ -17,12 +17,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Verify React files
+      - name: Verify pre-built files exist
         run: |
-          echo "Checking for React build files..."
-          ls -la index.html
-          ls -la static/js/main.*.js || echo "No React JS files found"
-          ls -la static/css/main.*.css || echo "No React CSS files found"
+          echo "Checking for pre-built React files..."
+          ls -la index.html || echo "ERROR: No index.html found"
+          ls -la static/js/ || echo "ERROR: No static/js folder found"
+          ls -la static/css/ || echo "ERROR: No static/css folder found"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
