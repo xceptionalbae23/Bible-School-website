@@ -1,4 +1,4 @@
-name: Deploy Pre-Built React App
+name: Deploy Static Site
 
 on:
   push:
@@ -14,15 +14,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Verify pre-built files exist
-        run: |
-          echo "Checking for pre-built React files..."
-          ls -la index.html || echo "ERROR: No index.html found"
-          ls -la static/js/ || echo "ERROR: No static/js folder found"
-          ls -la static/css/ || echo "ERROR: No static/css folder found"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -30,6 +23,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
+          # Upload everything in the root (our pre-built files)
           path: .
 
       - name: Deploy to GitHub Pages
