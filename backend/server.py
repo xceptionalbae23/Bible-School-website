@@ -37,7 +37,7 @@ UPLOAD_DIR = Path("/app/backend/uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
 # Mount static files
-app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)))
 
 # JWT Configuration
 JWT_SECRET = os.getenv('JWT_SECRET', 'whibc-admin-secret-key-2025')
