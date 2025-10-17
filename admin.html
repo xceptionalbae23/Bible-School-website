@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Word of Hope Bible Institute</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 { 
+            color: #1a237e;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            border-color: #1a237e;
+            outline: none;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: #1a237e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .login-btn:hover {
+            background: #283593;
+        }
+        .credentials {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        .error {
+            color: #d32f2f;
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>Word of Hope Bible Institute</h1>
+        <div class="subtitle">Administrator Portal</div>
+        
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" value="admin" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" value="whibc2025" required>
+            </div>
+            
+            <button type="submit" class="login-btn">Access Admin Dashboard</button>
+            
+            <div class="error" id="errorMessage">
+                Invalid credentials. Please try again.
+            </div>
+        </form>
+        
+        <div class="credentials">
+            <strong>Demo Access:</strong><br>
+            • Username: <code>admin</code> | Password: <code>whibc2025</code><br>
+            • Username: <code>superadmin</code> | Password: <code>whibc@admin2025</code>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const error = document.getElementById('errorMessage');
+            
+            // Check credentials
+            if ((username === 'admin' && password === 'whibc2025') || 
+                (username === 'superadmin' && password === 'whibc@admin2025')) {
+                // Successful login - redirect to dashboard
+                window.location.href = 'dashboard.html';
+            } else {
+                error.style.display = 'block';
+            }
+        });
+
+        // Auto-submit after 3 seconds for quick demo
+        setTimeout(() => {
+            if (document.getElementById('username').value === 'admin') {
+                document.getElementById('loginForm').submit();
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
