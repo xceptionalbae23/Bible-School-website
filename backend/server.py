@@ -14,7 +14,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 import aiofiles
 import shutil
-import jwt
+import from jose import jwt
 import hashlib
 
 
