@@ -14,7 +14,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 import aiofiles
 import shutil
-import from jose import jwt
+from jose import jwt
 import hashlib
 
 
@@ -637,3 +637,4 @@ logger = logging.getLogger(__name__)
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+
