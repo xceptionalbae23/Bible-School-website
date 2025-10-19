@@ -56,6 +56,64 @@ print("🟢 Continuing with application setup...")
 
 
 
+🟢 Continuing with application setup...
+# =======================
+# DEBUG START - REMOVE AFTER FIX
+# =======================
+
+print("🟢 DEBUG: Reached main application code")
+
+# Your existing lifespan code - ADD PRINT AT START:
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("🟢 DEBUG: Lifespan startup starting")
+    # ... your existing lifespan code
+    print("🟢 DEBUG: Lifespan startup complete")
+    
+    yield
+    
+    print("🟢 DEBUG: Lifespan shutdown starting")
+    # ... your existing shutdown code
+    print("🟢 DEBUG: Lifespan shutdown complete")
+
+print("🟢 DEBUG: Creating FastAPI app")
+app = FastAPI(title="WHIBC Portal API", lifespan=lifespan)
+print("🟢 DEBUG: FastAPI app created")
+
+# Your existing routes - ADD PRINT:
+print("🟢 DEBUG: Setting up API routes")
+api_router = APIRouter(prefix="/api")
+# ... your route definitions
+
+print("🟢 DEBUG: Including router in app")
+app.include_router(api_router)
+print("🟢 DEBUG: Router included")
+
+print("🟢 DEBUG: Setting up CORS middleware")
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+print("🟢 DEBUG: CORS setup complete")
+
+print("🟢 DEBUG: Setting up logging")
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+print("🟢 DEBUG: Logging setup complete")
+
+# ADD THIS AT THE VERY END:
+print("🟢🟢🟢 DEBUG: APPLICATION SETUP COMPLETE - READY TO START SERVER")
+
+if __name__ == "__main__":
+    print("🟢 DEBUG: Starting uvicorn server")
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000
 
 from fastapi import FastAPI, APIRouter, HTTPException, BackgroundTasks, File, UploadFile, Form, Depends, status
 from fastapi.responses import JSONResponse
@@ -110,6 +168,7 @@ security = HTTPBearer()
 ADMIN_CREDENTIALS = {
     "admin": "whibc2025",  # username: password
     "superadmin": "whibc@admin2025"
+
 }
 
 
