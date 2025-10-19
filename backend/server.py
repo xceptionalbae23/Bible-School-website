@@ -1,3 +1,62 @@
+
+print("🟢🟢🟢 SCRIPT STARTED - VERY FIRST LINE")
+
+import sys
+print("🟢 sys imported")
+
+try:
+    print("🟢 Starting imports...")
+    from fastapi import FastAPI, APIRouter, HTTPException, BackgroundTasks, File, UploadFile, Form, Depends, status
+    print("🟢 FastAPI imported")
+    from fastapi.responses import JSONResponse
+    print("🟢 JSONResponse imported")
+    from fastapi.staticfiles import StaticFiles
+    print("🟢 StaticFiles imported")
+    from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+    print("🟢 HTTPBearer imported")
+    from dotenv import load_dotenv
+    print("🟢 dotenv imported")
+    from starlette.middleware.cors import CORSMiddleware
+    print("🟢 CORSMiddleware imported")
+    from motor.motor_asyncio import AsyncIOMotorClient
+    print("🟢 Motor imported")
+    import os
+    print("🟢 os imported")
+    import logging
+    print("🟢 logging imported")
+    from pathlib import Path
+    print("🟢 Path imported")
+    from pydantic import BaseModel, Field, EmailStr
+    print("🟢 Pydantic imported")
+    from typing import List, Optional
+    print("🟢 typing imported")
+    import uuid
+    print("🟢 uuid imported")
+    from datetime import datetime, timezone, timedelta
+    print("🟢 datetime imported")
+    import aiofiles
+    print("🟢 aiofiles imported")
+    import shutil
+    print("🟢 shutil imported")
+    from jose import jwt
+    print("🟢 jose.jwt imported")
+    from contextlib import asynccontextmanager
+    print("🟢🟢�� ALL IMPORTS SUCCESSFUL!")
+    
+except Exception as e:
+    print(f"🔴🔴🔴 IMPORT ERROR: {e}")
+    print(f"🔴🔴🔴 ERROR TYPE: {type(e).__name__}")
+    import traceback
+    traceback.print_exc()
+    sys.exit(1)
+
+print("🟢 Continuing with application setup...")
+
+
+
+
+
+
 from fastapi import FastAPI, APIRouter, HTTPException, BackgroundTasks, File, UploadFile, Form, Depends, status
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
