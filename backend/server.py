@@ -1,119 +1,56 @@
-
-print("🟢🟢🟢 SCRIPT STARTED - VERY FIRST LINE")
+print("DEBUG: SCRIPT STARTED - VERY FIRST LINE")
 
 import sys
-print("🟢 sys imported")
+print("DEBUG: sys imported")
 
 try:
-    print("🟢 Starting imports...")
+    print("DEBUG: Starting imports...")
     from fastapi import FastAPI, APIRouter, HTTPException, BackgroundTasks, File, UploadFile, Form, Depends, status
-    print("🟢 FastAPI imported")
+    print("DEBUG: FastAPI imported")
     from fastapi.responses import JSONResponse
-    print("🟢 JSONResponse imported")
+    print("DEBUG: JSONResponse imported")
     from fastapi.staticfiles import StaticFiles
-    print("🟢 StaticFiles imported")
+    print("DEBUG: StaticFiles imported")
     from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-    print("🟢 HTTPBearer imported")
+    print("DEBUG: HTTPBearer imported")
     from dotenv import load_dotenv
-    print("🟢 dotenv imported")
+    print("DEBUG: dotenv imported")
     from starlette.middleware.cors import CORSMiddleware
-    print("🟢 CORSMiddleware imported")
+    print("DEBUG: CORSMiddleware imported")
     from motor.motor_asyncio import AsyncIOMotorClient
-    print("🟢 Motor imported")
+    print("DEBUG: Motor imported")
     import os
-    print("🟢 os imported")
+    print("DEBUG: os imported")
     import logging
-    print("🟢 logging imported")
+    print("DEBUG: logging imported")
     from pathlib import Path
-    print("🟢 Path imported")
+    print("DEBUG: Path imported")
     from pydantic import BaseModel, Field, EmailStr
-    print("🟢 Pydantic imported")
+    print("DEBUG: Pydantic imported")
     from typing import List, Optional
-    print("🟢 typing imported")
+    print("DEBUG: typing imported")
     import uuid
-    print("🟢 uuid imported")
+    print("DEBUG: uuid imported")
     from datetime import datetime, timezone, timedelta
-    print("🟢 datetime imported")
+    print("DEBUG: datetime imported")
     import aiofiles
-    print("🟢 aiofiles imported")
+    print("DEBUG: aiofiles imported")
     import shutil
-    print("🟢 shutil imported")
+    print("DEBUG: shutil imported")
     from jose import jwt
-    print("🟢 jose.jwt imported")
+    print("DEBUG: jose.jwt imported")
     from contextlib import asynccontextmanager
-    print("🟢🟢�� ALL IMPORTS SUCCESSFUL!")
+    print("DEBUG: ALL IMPORTS SUCCESSFUL!")
     
 except Exception as e:
-    print(f"🔴🔴🔴 IMPORT ERROR: {e}")
-    print(f"🔴🔴🔴 ERROR TYPE: {type(e).__name__}")
+    print(f"ERROR: IMPORT ERROR: {e}")
+    print(f"ERROR: ERROR TYPE: {type(e).__name__}")
     import traceback
     traceback.print_exc()
     sys.exit(1)
 
-print("🟢 Continuing with application setup...")
-
-
-
-
-
-🟢 Continuing with application setup...
-# =======================
-# DEBUG START - REMOVE AFTER FIX
-# =======================
-
-print("🟢 DEBUG: Reached main application code")
-
-# Your existing lifespan code - ADD PRINT AT START:
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    print("🟢 DEBUG: Lifespan startup starting")
-    # ... your existing lifespan code
-    print("🟢 DEBUG: Lifespan startup complete")
-    
-    yield
-    
-    print("🟢 DEBUG: Lifespan shutdown starting")
-    # ... your existing shutdown code
-    print("🟢 DEBUG: Lifespan shutdown complete")
-
-print("🟢 DEBUG: Creating FastAPI app")
-app = FastAPI(title="WHIBC Portal API", lifespan=lifespan)
-print("🟢 DEBUG: FastAPI app created")
-
-# Your existing routes - ADD PRINT:
-print("🟢 DEBUG: Setting up API routes")
-api_router = APIRouter(prefix="/api")
-# ... your route definitions
-
-print("🟢 DEBUG: Including router in app")
-app.include_router(api_router)
-print("🟢 DEBUG: Router included")
-
-print("🟢 DEBUG: Setting up CORS middleware")
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-print("🟢 DEBUG: CORS setup complete")
-
-print("🟢 DEBUG: Setting up logging")
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-print("🟢 DEBUG: Logging setup complete")
-
-# ADD THIS AT THE VERY END:
-print("🟢🟢🟢 DEBUG: APPLICATION SETUP COMPLETE - READY TO START SERVER")
-
-if __name__ == "__main__":
-    print("🟢 DEBUG: Starting uvicorn server")
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000
+print("DEBUG: Continuing with application setup...")
+  
 
 from fastapi import FastAPI, APIRouter, HTTPException, BackgroundTasks, File, UploadFile, Form, Depends, status
 from fastapi.responses import JSONResponse
