@@ -692,3 +692,4 @@ logger = logging.getLogger(__name__)
 
 # Debug version
 # Fixed: Removed duplicates and using lifespan pattern
+# COMPLETE REWRITE: Fixed duplicates and lifespan pattern
