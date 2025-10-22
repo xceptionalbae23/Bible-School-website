@@ -699,7 +699,16 @@ try:
     print("DEBUG: Router included")
 
     print("DEBUG: Setting up CORS middleware")
-    app.add_middleware(
+    apprint("DEBUG: Setting up CORS middleware")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://bible-school-website-1.onrender.com",  # Your frontend
+        "http://localhost:3000"  # For local development
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],p.add_middleware(
         CORSMiddleware,
         allow_credentials=True,
         allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
