@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 print("DEBUG: SCRIPT STARTED - VERY FIRST LINE")
 
 import sys
@@ -39,6 +40,8 @@ try:
     print("DEBUG: shutil imported")
     from jose import jwt
     print("DEBUG: jose.jwt imported")
+    import hashlib
+    print("DEBUG: hashlib imported")
     from contextlib import asynccontextmanager
     print("DEBUG: ALL IMPORTS SUCCESSFUL!")
     
@@ -50,646 +53,679 @@ except Exception as e:
     sys.exit(1)
 
 print("DEBUG: Continuing with application setup...")
-  
 
-from fastapi import FastAPI, APIRouter, HTTPException, BackgroundTasks, File, UploadFile, Form, Depends, status
-from fastapi.responses import JSONResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
-import os
-import logging
-from pathlib import Path
-from pydantic import BaseModel, Field, EmailStr
-from typing import List, Optional
-import uuid
-from datetime import datetime, timezone, timedelta
-import aiofiles
-import shutil
-from jose import jwt
-import hashlib
+# ADD ERROR HANDLING BLOCK AROUND MAIN CODE
+try:
+    print("DEBUG: Starting main application code...")
 
+    # =======================
+    # LIFESPAN AND APP SETUP
+    # =======================
 
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+    print("DEBUG: Setting up lifespan")
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        print("DEBUG: Lifespan - Startup starting")
+        client = AsyncIOMotorClient(os.environ['MONGO_URL'])
+        app.mongodb_client = client
+        app.database = client[os.environ['DB_NAME']]
+        print("DEBUG: Lifespan - MongoDB connected")
+        
+        yield
+        
+        print("DEBUG: Lifespan - Shutdown starting")
+        client.close()
+        print("DEBUG: Lifespan - Shutdown complete")
 
-# Create the main app without a prefix
-app = FastAPI(title="WHIBC Portal API")
+    print("DEBUG: Creating FastAPI app")
+    app = FastAPI(title="WHIBC Portal API", lifespan=lifespan)
+    print("DEBUG: FastAPI app created")
 
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
+    # =======================
+    # ROUTER SETUP
+    # =======================
 
-# Create uploads directory
-UPLOAD_DIR = Path("uploads")
-UPLOAD_DIR.mkdir(exist_ok=True)
+    print("DEBUG: Setting up API router")
+    api_router = APIRouter(prefix="/api")
+    print("DEBUG: API router created")
 
-# Mount static files
-app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)))
+    # =======================
+    # UPLOADS DIRECTORY
+    # =======================
 
-# JWT Configuration
-JWT_SECRET = os.getenv('JWT_SECRET', 'whibc-admin-secret-key-2025')
-JWT_ALGORITHM = 'HS256'
-JWT_EXPIRATION_HOURS = 24
+    print("DEBUG: Setting up uploads directory")
+    UPLOAD_DIR = Path("uploads")
+    UPLOAD_DIR.mkdir(exist_ok=True)
+    print("DEBUG: Uploads directory ready")
 
-# Security
-security = HTTPBearer()
+    # Mount static files
+    app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)))
 
-# Admin credentials (in production, these should be in database with proper hashing)
-ADMIN_CREDENTIALS = {
-    "admin": "whibc2025",  # username: password
-    "superadmin": "whibc@admin2025"
+    # =======================
+    # CONFIGURATION
+    # =======================
 
-}
+    print("DEBUG: Loading configuration")
+    JWT_SECRET = os.getenv('JWT_SECRET', 'whibc-admin-secret-key-2025')
+    JWT_ALGORITHM = 'HS256'
+    JWT_EXPIRATION_HOURS = 24
 
+    # Security
+    security = HTTPBearer()
 
-# Email Service Class
-class EmailDeliveryError(Exception):
-    pass
+    # Admin credentials (in production, these should be in database with proper hashing)
+    ADMIN_CREDENTIALS = {
+        "admin": "whibc2025",  # username: password
+        "superadmin": "whibc@admin2025"
+    }
+    print("DEBUG: Configuration loaded")
 
-def send_email_simple(to: str, subject: str, content: str):
-    """Simple email sending function without SendGrid dependency for now"""
-    try:
-        # For now, just log the email instead of sending it
-        # This prevents the 403 error and allows the application to work
-        logging.info(f"Email would be sent to: {to}")
-        logging.info(f"Subject: {subject}")
-        logging.info(f"Content: {content[:100]}...")
-        return True
-    except Exception as e:
-        logging.error(f"Email simulation error: {str(e)}")
-        return False
+    # =======================
+    # MODELS
+    # =======================
 
+    print("DEBUG: Defining models")
 
-# Define Models
-class AdminLogin(BaseModel):
-    username: str
-    password: str
+    class EmailDeliveryError(Exception):
+        pass
 
-class AdminLoginResponse(BaseModel):
-    access_token: str
-    token_type: str
-    expires_in: int
-    admin_info: dict
+    class AdminLogin(BaseModel):
+        username: str
+        password: str
 
-class StudentRegistration(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    full_name: str
-    date_of_birth: str
-    gender: str
-    address: str
-    email: EmailStr
-    phone_number: str
-    educational_background: str
-    program_applied: str
-    study_mode: str  # On-campus / Online / Hybrid
-    document_filename: Optional[str] = None
-    document_path: Optional[str] = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    class AdminLoginResponse(BaseModel):
+        access_token: str
+        token_type: str
+        expires_in: int
+        admin_info: dict
 
-class StudentRegistrationCreate(BaseModel):
-    full_name: str
-    date_of_birth: str
-    gender: str
-    address: str
-    email: EmailStr
-    phone_number: str
-    educational_background: str
-    program_applied: str
-    study_mode: str
+    class StudentRegistration(BaseModel):
+        id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+        full_name: str
+        date_of_birth: str
+        gender: str
+        address: str
+        email: EmailStr
+        phone_number: str
+        educational_background: str
+        program_applied: str
+        study_mode: str  # On-campus / Online / Hybrid
+        document_filename: Optional[str] = None
+        document_path: Optional[str] = None
+        created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class Partnership(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    organization_name: str
-    contact_person: str
-    email: EmailStr
-    phone_number: str
-    partnership_type: str
-    message: str
-    document_filename: Optional[str] = None
-    document_path: Optional[str] = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    class StudentRegistrationCreate(BaseModel):
+        full_name: str
+        date_of_birth: str
+        gender: str
+        address: str
+        email: EmailStr
+        phone_number: str
+        educational_background: str
+        program_applied: str
+        study_mode: str
 
-class PartnershipCreate(BaseModel):
-    organization_name: str
-    contact_person: str
-    email: EmailStr
-    phone_number: str
-    partnership_type: str
-    message: str
+    class Partnership(BaseModel):
+        id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+        organization_name: str
+        contact_person: str
+        email: EmailStr
+        phone_number: str
+        partnership_type: str
+        message: str
+        document_filename: Optional[str] = None
+        document_path: Optional[str] = None
+        created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class EmailResponse(BaseModel):
-    status: str
-    message: str
+    class PartnershipCreate(BaseModel):
+        organization_name: str
+        contact_person: str
+        email: EmailStr
+        phone_number: str
+        partnership_type: str
+        message: str
 
-class GalleryImage(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    title: str
-    description: str
-    filename: str
-    path: str
-    category: str
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    class EmailResponse(BaseModel):
+        status: str
+        message: str
 
+    class GalleryImage(BaseModel):
+        id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+        title: str
+        description: str
+        filename: str
+        path: str
+        category: str
+        created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-# Helper functions to prepare data for MongoDB
-def prepare_for_mongo(data):
-    """Convert datetime objects to ISO strings for MongoDB storage"""
-    if isinstance(data.get('created_at'), datetime):
-        data['created_at'] = data['created_at'].isoformat()
-    return data
+    print("DEBUG: Models defined")
 
+    # =======================
+    # HELPER FUNCTIONS
+    # =======================
 
-# Authentication functions
-def hash_password(password: str) -> str:
-    """Hash password using SHA256"""
-    return hashlib.sha256(password.encode()).hexdigest()
+    print("DEBUG: Setting up helper functions")
 
-def verify_password(plain_password: str, username: str) -> bool:
-    """Verify password against stored credentials"""
-    return ADMIN_CREDENTIALS.get(username) == plain_password
+    def prepare_for_mongo(data):
+        """Convert datetime objects to ISO strings for MongoDB storage"""
+        if isinstance(data.get('created_at'), datetime):
+            data['created_at'] = data['created_at'].isoformat()
+        return data
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    """Create JWT access token"""
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS)
-    
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
-    return encoded_jwt
+    def send_email_simple(to: str, subject: str, content: str):
+        """Simple email sending function without SendGrid dependency for now"""
+        try:
+            # For now, just log the email instead of sending it
+            logging.info(f"Email would be sent to: {to}")
+            logging.info(f"Subject: {subject}")
+            logging.info(f"Content: {content[:100]}...")
+            return True
+        except Exception as e:
+            logging.error(f"Email simulation error: {str(e)}")
+            return False
 
-def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Verify JWT token"""
-    try:
-        payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+    def hash_password(password: str) -> str:
+        """Hash password using SHA256"""
+        return hashlib.sha256(password.encode()).hexdigest()
+
+    def verify_password(plain_password: str, username: str) -> bool:
+        """Verify password against stored credentials"""
+        return ADMIN_CREDENTIALS.get(username) == plain_password
+
+    def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+        """Create JWT access token"""
+        to_encode = data.copy()
+        if expires_delta:
+            expire = datetime.utcnow() + expires_delta
+        else:
+            expire = datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS)
+        
+        to_encode.update({"exp": expire})
+        encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+        return encoded_jwt
+
+    def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+        """Verify JWT token"""
+        try:
+            payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+            username: str = payload.get("sub")
+            if username is None:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid authentication credentials",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+            return username
+        except jwt.PyJWTError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid authentication credentials",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        return username
-    except jwt.PyJWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
 
+    async def save_uploaded_file(file: UploadFile, prefix: str) -> tuple:
+        """Save uploaded file and return filename and path"""
+        if file.filename:
+            # Generate unique filename
+            file_extension = Path(file.filename).suffix
+            unique_filename = f"{prefix}_{uuid.uuid4()}{file_extension}"
+            file_path = UPLOAD_DIR / unique_filename
+            
+            # Save file
+            async with aiofiles.open(file_path, 'wb') as buffer:
+                content = await file.read()
+                await buffer.write(content)
+            
+            return unique_filename, str(file_path)
+        return None, None
 
-# Email templates
-def send_registration_confirmation(email: str, full_name: str, program: str):
-    """Send registration confirmation email"""
-    subject = "Registration Confirmation - Word of Hope International Bible College"
-    
-    html_content = f"""
-    <html>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #1e4a72; text-align: center;">Word of Hope International Bible College</h2>
-                <h3 style="color: #2e7d32;">Registration Confirmation</h3>
-                
-                <p>Dear {full_name},</p>
-                
-                <p>Thank you for your registration with Word of Hope International Bible College. We have successfully received your application for the <strong>{program}</strong> program.</p>
-                
-                <div style="background-color: #f5f5f5; padding: 15px; border-left: 4px solid #1e4a72; margin: 20px 0;">
-                    <h4 style="margin-top: 0; color: #1e4a72;">What's Next?</h4>
+    def send_registration_confirmation(email: str, full_name: str, program: str):
+        """Send registration confirmation email"""
+        subject = "Registration Confirmation - Word of Hope International Bible College"
+        
+        html_content = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <h2 style="color: #1e4a72; text-align: center;">Word of Hope International Bible College</h2>
+                    <h3 style="color: #2e7d32;">Registration Confirmation</h3>
+                    
+                    <p>Dear {full_name},</p>
+                    
+                    <p>Thank you for your registration with Word of Hope International Bible College. We have successfully received your application for the <strong>{program}</strong> program.</p>
+                    
+                    <div style="background-color: #f5f5f5; padding: 15px; border-left: 4px solid #1e4a72; margin: 20px 0;">
+                        <h4 style="margin-top: 0; color: #1e4a72;">What's Next?</h4>
+                        <ul>
+                            <li>Our admissions team will review your application</li>
+                            <li>You will receive further instructions within 3-5 business days</li>
+                            <li>Please prepare any additional documents that may be required</li>
+                        </ul>
+                    </div>
+                    
+                    <p><strong>Our Motto:</strong> Excellence in Academic and Character</p>
+                    
+                    <p>For any questions, please contact us:</p>
                     <ul>
-                        <li>Our admissions team will review your application</li>
-                        <li>You will receive further instructions within 3-5 business days</li>
-                        <li>Please prepare any additional documents that may be required</li>
+                        <li>Email: wohibc2025@gmail.com</li>
+                        <li>Phone: +2349042520176 / +2349157788318</li>
                     </ul>
+                    
+                    <p>Blessings,<br>
+                    <strong>Word of Hope International Bible College<br>
+                    Admissions Office</strong></p>
                 </div>
-                
-                <p><strong>Our Motto:</strong> Excellence in Academic and Character</p>
-                
-                <p>For any questions, please contact us:</p>
-                <ul>
-                    <li>Email: wohibc2025@gmail.com</li>
-                    <li>Phone: +2349042520176 / +2349157788318</li>
-                </ul>
-                
-                <p>Blessings,<br>
-                <strong>Word of Hope International Bible College<br>
-                Admissions Office</strong></p>
-            </div>
-        </body>
-    </html>
-    """
-    
-    return send_email_simple(email, subject, html_content)
-
-def send_partnership_acknowledgment(email: str, organization: str, partnership_type: str):
-    """Send partnership acknowledgment email"""
-    subject = "Partnership Application Received - Word of Hope International Bible College"
-    
-    html_content = f"""
-    <html>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #1e4a72; text-align: center;">Word of Hope International Bible College</h2>
-                <h3 style="color: #2e7d32;">Partnership Application Received</h3>
-                
-                <p>Dear Partner,</p>
-                
-                <p>Thank you for your interest in partnering with Word of Hope International Bible College. We have received your application for <strong>{partnership_type}</strong> from <strong>{organization}</strong>.</p>
-                
-                <p>Our partnership team will review your application and contact you within 5-7 business days to discuss next steps.</p>
-                
-                <p>Blessings,<br>
-                <strong>Word of Hope International Bible College<br>
-                Partnership Development Team</strong></p>
-            </div>
-        </body>
-    </html>
-    """
-    
-    return send_email_simple(email, subject, html_content)
-
-
-# File upload utility
-async def save_uploaded_file(file: UploadFile, prefix: str) -> tuple:
-    """Save uploaded file and return filename and path"""
-    if file.filename:
-        # Generate unique filename
-        file_extension = Path(file.filename).suffix
-        unique_filename = f"{prefix}_{uuid.uuid4()}{file_extension}"
-        file_path = UPLOAD_DIR / unique_filename
+            </body>
+        </html>
+        """
         
-        # Save file
-        async with aiofiles.open(file_path, 'wb') as buffer:
-            content = await file.read()
-            await buffer.write(content)
+        return send_email_simple(email, subject, html_content)
+
+    def send_partnership_acknowledgment(email: str, organization: str, partnership_type: str):
+        """Send partnership acknowledgment email"""
+        subject = "Partnership Application Received - Word of Hope International Bible College"
         
-        return unique_filename, str(file_path)
-    return None, None
+        html_content = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <h2 style="color: #1e4a72; text-align: center;">Word of Hope International Bible College</h2>
+                    <h3 style="color: #2e7d32;">Partnership Application Received</h3>
+                    
+                    <p>Dear Partner,</p>
+                    
+                    <p>Thank you for your interest in partnering with Word of Hope International Bible College. We have received your application for <strong>{partnership_type}</strong> from <strong>{organization}</strong>.</p>
+                    
+                    <p>Our partnership team will review your application and contact you within 5-7 business days to discuss next steps.</p>
+                    
+                    <p>Blessings,<br>
+                    <strong>Word of Hope International Bible College<br>
+                    Partnership Development Team</strong></p>
+                </div>
+            </body>
+        </html>
+        """
+        
+        return send_email_simple(email, subject, html_content)
 
+    print("DEBUG: Helper functions defined")
 
-# API Routes
-@api_router.get("/")
-async def root():
-    return {"message": "Word of Hope International Bible College API", "status": "active"}
+    # =======================
+    # API ROUTES
+    # =======================
 
-# Admin Authentication Routes
-@api_router.post("/admin/login", response_model=AdminLoginResponse)
-async def admin_login(credentials: AdminLogin):
-    """Admin login endpoint"""
-    try:
-        if not verify_password(credentials.password, credentials.username):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect username or password",
-                headers={"WWW-Authenticate": "Bearer"},
+    print("DEBUG: Setting up API routes")
+
+    @api_router.get("/")
+    async def root():
+        return {"message": "Word of Hope International Bible College API", "status": "active"}
+
+    @api_router.post("/admin/login", response_model=AdminLoginResponse)
+    async def admin_login(credentials: AdminLogin):
+        """Admin login endpoint"""
+        try:
+            if not verify_password(credentials.password, credentials.username):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Incorrect username or password",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+            
+            # Create access token
+            access_token_expires = timedelta(hours=JWT_EXPIRATION_HOURS)
+            access_token = create_access_token(
+                data={"sub": credentials.username}, expires_delta=access_token_expires
             )
-        
-        # Create access token
-        access_token_expires = timedelta(hours=JWT_EXPIRATION_HOURS)
-        access_token = create_access_token(
-            data={"sub": credentials.username}, expires_delta=access_token_expires
-        )
-        
-        return AdminLoginResponse(
-            access_token=access_token,
-            token_type="bearer",
-            expires_in=JWT_EXPIRATION_HOURS * 3600,  # in seconds
-            admin_info={
-                "username": credentials.username,
-                "role": "administrator",
-                "permissions": ["read", "write", "admin"]
+            
+            return AdminLoginResponse(
+                access_token=access_token,
+                token_type="bearer",
+                expires_in=JWT_EXPIRATION_HOURS * 3600,  # in seconds
+                admin_info={
+                    "username": credentials.username,
+                    "role": "administrator",
+                    "permissions": ["read", "write", "admin"]
+                }
+            )
+        except HTTPException:
+            raise
+        except Exception as e:
+            logging.error(f"Admin login error: {str(e)}")
+            raise HTTPException(status_code=500, detail="Login failed")
+
+    @api_router.post("/admin/verify-token")
+    async def verify_admin_token(current_user: str = Depends(verify_token)):
+        """Verify admin token"""
+        return {
+            "valid": True,
+            "username": current_user,
+            "role": "administrator"
+        }
+
+    @api_router.post("/register-student", response_model=EmailResponse)
+    async def register_student(
+        full_name: str = Form(...),
+        date_of_birth: str = Form(...),
+        gender: str = Form(...),
+        address: str = Form(...),
+        email: EmailStr = Form(...),
+        phone_number: str = Form(...),
+        educational_background: str = Form(...),
+        program_applied: str = Form(...),
+        study_mode: str = Form(...),
+        document: Optional[UploadFile] = File(None),
+        background_tasks: BackgroundTasks = BackgroundTasks()
+    ):
+        """Register a new student with optional document upload"""
+        try:
+            # Check if email already exists in student registrations OR partnership applications
+            existing_student = await app.database.student_registrations.find_one({"email": email})
+            existing_partnership = await app.database.partnerships.find_one({"email": email})
+            
+            if existing_student:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Email {email} is already registered as a student. Please use a different email address or contact admissions if this is an error."
+                )
+            
+            if existing_partnership:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Email {email} is already registered for a partnership application. Please use a different email address or contact admissions if this is an error."
+                )
+            
+            # Handle file upload
+            document_filename = None
+            document_path = None
+            if document and document.filename:
+                document_filename, document_path = await save_uploaded_file(document, "student_doc")
+            
+            # Create registration object
+            registration_data = {
+                "full_name": full_name,
+                "date_of_birth": date_of_birth,
+                "gender": gender,
+                "address": address,
+                "email": email,
+                "phone_number": phone_number,
+                "educational_background": educational_background,
+                "program_applied": program_applied,
+                "study_mode": study_mode,
+                "document_filename": document_filename,
+                "document_path": document_path
             }
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        logging.error(f"Admin login error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Login failed")
-
-@api_router.post("/admin/verify-token")
-async def verify_admin_token(current_user: str = Depends(verify_token)):
-    """Verify admin token"""
-    return {
-        "valid": True,
-        "username": current_user,
-        "role": "administrator"
-    }
-
-@api_router.post("/register-student", response_model=EmailResponse)
-async def register_student(
-    full_name: str = Form(...),
-    date_of_birth: str = Form(...),
-    gender: str = Form(...),
-    address: str = Form(...),
-    email: EmailStr = Form(...),
-    phone_number: str = Form(...),
-    educational_background: str = Form(...),
-    program_applied: str = Form(...),
-    study_mode: str = Form(...),
-    document: Optional[UploadFile] = File(None),
-    background_tasks: BackgroundTasks = BackgroundTasks()
-):
-    """Register a new student with optional document upload"""
-    try:
-        # Check if email already exists in student registrations OR partnership applications
-        existing_student = await db.student_registrations.find_one({"email": email})
-        existing_partnership = await db.partnerships.find_one({"email": email})
-        
-        if existing_student:
-            raise HTTPException(
-                status_code=400, 
-                detail=f"Email {email} is already registered as a student. Please use a different email address or contact admissions if this is an error."
+            
+            student_obj = StudentRegistration(**registration_data)
+            
+            # Prepare for MongoDB and save
+            mongo_data = prepare_for_mongo(student_obj.dict())
+            await app.database.student_registrations.insert_one(mongo_data)
+            
+            # Send confirmation email in background
+            background_tasks.add_task(
+                send_registration_confirmation,
+                email,
+                full_name,
+                program_applied
             )
-        
-        if existing_partnership:
-            raise HTTPException(
-                status_code=400, 
-                detail=f"Email {email} is already registered for a partnership application. Please use a different email address or contact admissions if this is an error."
+            
+            return EmailResponse(
+                status="success",
+                message="Registration submitted successfully! Check your email for confirmation."
             )
-        
-        # Handle file upload
-        document_filename = None
-        document_path = None
-        if document and document.filename:
-            document_filename, document_path = await save_uploaded_file(document, "student_doc")
-        
-        # Create registration object
-        registration_data = {
-            "full_name": full_name,
-            "date_of_birth": date_of_birth,
-            "gender": gender,
-            "address": address,
-            "email": email,
-            "phone_number": phone_number,
-            "educational_background": educational_background,
-            "program_applied": program_applied,
-            "study_mode": study_mode,
-            "document_filename": document_filename,
-            "document_path": document_path
-        }
-        
-        student_obj = StudentRegistration(**registration_data)
-        
-        # Prepare for MongoDB and save
-        mongo_data = prepare_for_mongo(student_obj.dict())
-        await db.student_registrations.insert_one(mongo_data)
-        
-        # Send confirmation email in background
-        background_tasks.add_task(
-            send_registration_confirmation,
-            email,
-            full_name,
-            program_applied
-        )
-        
-        return EmailResponse(
-            status="success",
-            message="Registration submitted successfully! Check your email for confirmation."
-        )
-    except HTTPException:
-        # Re-raise HTTP exceptions (like duplicate email)
-        raise
-    except Exception as e:
-        logging.error(f"Student registration error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Registration failed. Please try again.")
+        except HTTPException:
+            # Re-raise HTTP exceptions (like duplicate email)
+            raise
+        except Exception as e:
+            logging.error(f"Student registration error: {str(e)}")
+            raise HTTPException(status_code=500, detail="Registration failed. Please try again.")
 
-@api_router.post("/submit-partnership", response_model=EmailResponse)
-async def submit_partnership(
-    organization_name: str = Form(...),
-    contact_person: str = Form(...),
-    email: EmailStr = Form(...),
-    phone_number: str = Form(...),
-    partnership_type: str = Form(...),
-    message: str = Form(...),
-    document: Optional[UploadFile] = File(None),
-    background_tasks: BackgroundTasks = BackgroundTasks()
-):
-    """Submit partnership application with optional document upload"""
-    try:
-        # Check if email already exists in partnership applications OR student registrations
-        existing_student = await db.student_registrations.find_one({"email": email})
-        existing_partnership = await db.partnerships.find_one({"email": email})
-        
-        if existing_partnership:
-            raise HTTPException(
-                status_code=400, 
-                detail=f"Email {email} is already registered for a partnership application. Please use a different email address or contact us if this is an error."
+    @api_router.post("/submit-partnership", response_model=EmailResponse)
+    async def submit_partnership(
+        organization_name: str = Form(...),
+        contact_person: str = Form(...),
+        email: EmailStr = Form(...),
+        phone_number: str = Form(...),
+        partnership_type: str = Form(...),
+        message: str = Form(...),
+        document: Optional[UploadFile] = File(None),
+        background_tasks: BackgroundTasks = BackgroundTasks()
+    ):
+        """Submit partnership application with optional document upload"""
+        try:
+            # Check if email already exists in partnership applications OR student registrations
+            existing_student = await app.database.student_registrations.find_one({"email": email})
+            existing_partnership = await app.database.partnerships.find_one({"email": email})
+            
+            if existing_partnership:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Email {email} is already registered for a partnership application. Please use a different email address or contact us if this is an error."
+                )
+            
+            if existing_student:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Email {email} is already registered as a student. Please use a different email address or contact us if this is an error."
+                )
+            
+            # Handle file upload
+            document_filename = None
+            document_path = None
+            if document and document.filename:
+                document_filename, document_path = await save_uploaded_file(document, "partnership_doc")
+            
+            # Create partnership object
+            partnership_data = {
+                "organization_name": organization_name,
+                "contact_person": contact_person,
+                "email": email,
+                "phone_number": phone_number,
+                "partnership_type": partnership_type,
+                "message": message,
+                "document_filename": document_filename,
+                "document_path": document_path
+            }
+            
+            partnership_obj = Partnership(**partnership_data)
+            
+            # Prepare for MongoDB and save
+            mongo_data = prepare_for_mongo(partnership_obj.dict())
+            await app.database.partnerships.insert_one(mongo_data)
+            
+            # Send acknowledgment email in background
+            background_tasks.add_task(
+                send_partnership_acknowledgment,
+                email,
+                organization_name,
+                partnership_type
             )
-        
-        if existing_student:
-            raise HTTPException(
-                status_code=400, 
-                detail=f"Email {email} is already registered as a student. Please use a different email address or contact us if this is an error."
+            
+            return EmailResponse(
+                status="success",
+                message="Partnership application submitted successfully! We'll contact you soon."
             )
-        
-        # Handle file upload
-        document_filename = None
-        document_path = None
-        if document and document.filename:
-            document_filename, document_path = await save_uploaded_file(document, "partnership_doc")
-        
-        # Create partnership object
-        partnership_data = {
-            "organization_name": organization_name,
-            "contact_person": contact_person,
-            "email": email,
-            "phone_number": phone_number,
-            "partnership_type": partnership_type,
-            "message": message,
-            "document_filename": document_filename,
-            "document_path": document_path
-        }
-        
-        partnership_obj = Partnership(**partnership_data)
-        
-        # Prepare for MongoDB and save
-        mongo_data = prepare_for_mongo(partnership_obj.dict())
-        await db.partnerships.insert_one(mongo_data)
-        
-        # Send acknowledgment email in background
-        background_tasks.add_task(
-            send_partnership_acknowledgment,
-            email,
-            organization_name,
-            partnership_type
-        )
-        
-        return EmailResponse(
-            status="success",
-            message="Partnership application submitted successfully! We'll contact you soon."
-        )
-    except HTTPException:
-        # Re-raise HTTP exceptions (like duplicate email)
-        raise
-    except Exception as e:
-        logging.error(f"Partnership submission error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Partnership submission failed. Please try again.")
+        except HTTPException:
+            # Re-raise HTTP exceptions (like duplicate email)
+            raise
+        except Exception as e:
+            logging.error(f"Partnership submission error: {str(e)}")
+            raise HTTPException(status_code=500, detail="Partnership submission failed. Please try again.")
 
-# Protected Admin Routes
-@api_router.get("/registrations", response_model=List[StudentRegistration])
-async def get_registrations(current_user: str = Depends(verify_token)):
-    """Get all student registrations (admin endpoint)"""
-    try:
-        registrations = await db.student_registrations.find().sort("created_at", -1).to_list(1000)
-        return [StudentRegistration(**reg) for reg in registrations]
-    except Exception as e:
-        logging.error(f"Get registrations error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to fetch registrations")
+    @api_router.get("/registrations", response_model=List[StudentRegistration])
+    async def get_registrations(current_user: str = Depends(verify_token)):
+        """Get all student registrations (admin endpoint)"""
+        try:
+            registrations = await app.database.student_registrations.find().sort("created_at", -1).to_list(1000)
+            return [StudentRegistration(**reg) for reg in registrations]
+        except Exception as e:
+            logging.error(f"Get registrations error: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to fetch registrations")
 
-@api_router.get("/partnerships", response_model=List[Partnership])
-async def get_partnerships(current_user: str = Depends(verify_token)):
-    """Get all partnerships (admin endpoint)"""
-    try:
-        partnerships = await db.partnerships.find().sort("created_at", -1).to_list(1000)
-        return [Partnership(**partnership) for partnership in partnerships]
-    except Exception as e:
-        logging.error(f"Get partnerships error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to fetch partnerships")
+    @api_router.get("/partnerships", response_model=List[Partnership])
+    async def get_partnerships(current_user: str = Depends(verify_token)):
+        """Get all partnerships (admin endpoint)"""
+        try:
+            partnerships = await app.database.partnerships.find().sort("created_at", -1).to_list(1000)
+            return [Partnership(**partnership) for partnership in partnerships]
+        except Exception as e:
+            logging.error(f"Get partnerships error: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to fetch partnerships")
 
-@api_router.post("/gallery/upload")
-async def upload_gallery_image(
-    title: str = Form(...),
-    description: str = Form(...),
-    category: str = Form(...),
-    image: UploadFile = File(...),
-    current_user: str = Depends(verify_token)
-):
-    """Upload image to gallery (admin only)"""
-    try:
-        # Save image file
-        filename, file_path = await save_uploaded_file(image, "gallery")
-        
-        # Create gallery entry
-        gallery_item = GalleryImage(
-            title=title,
-            description=description,
-            filename=filename,
-            path=file_path,
-            category=category
-        )
-        
-        # Save to database
-        mongo_data = prepare_for_mongo(gallery_item.dict())
-        await db.gallery.insert_one(mongo_data)
-        
-        return {"status": "success", "message": "Image uploaded successfully", "filename": filename}
-    except Exception as e:
-        logging.error(f"Gallery upload error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to upload image")
+    @api_router.post("/gallery/upload")
+    async def upload_gallery_image(
+        title: str = Form(...),
+        description: str = Form(...),
+        category: str = Form(...),
+        image: UploadFile = File(...),
+        current_user: str = Depends(verify_token)
+    ):
+        """Upload image to gallery (admin only)"""
+        try:
+            # Save image file
+            filename, file_path = await save_uploaded_file(image, "gallery")
+            
+            # Create gallery entry
+            gallery_item = GalleryImage(
+                title=title,
+                description=description,
+                filename=filename,
+                path=file_path,
+                category=category
+            )
+            
+            # Save to database
+            mongo_data = prepare_for_mongo(gallery_item.dict())
+            await app.database.gallery.insert_one(mongo_data)
+            
+            return {"status": "success", "message": "Image uploaded successfully", "filename": filename}
+        except Exception as e:
+            logging.error(f"Gallery upload error: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to upload image")
 
-@api_router.get("/gallery")
-async def get_gallery():
-    """Get all gallery images"""
-    try:
-        images = await db.gallery.find().sort("created_at", -1).to_list(1000)
-        return [GalleryImage(**img) for img in images]
-    except Exception as e:
-        logging.error(f"Get gallery error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to fetch gallery")
+    @api_router.get("/gallery")
+    async def get_gallery():
+        """Get all gallery images"""
+        try:
+            images = await app.database.gallery.find().sort("created_at", -1).to_list(1000)
+            return [GalleryImage(**img) for img in images]
+        except Exception as e:
+            logging.error(f"Get gallery error: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to fetch gallery")
 
-@api_router.delete("/gallery/{image_id}")
-async def delete_gallery_image(image_id: str, current_user: str = Depends(verify_token)):
-    """Delete image from gallery (admin only)"""
-    try:
-        # Find the image in database
-        image = await db.gallery.find_one({"id": image_id})
-        if not image:
-            raise HTTPException(status_code=404, detail="Image not found")
-        
-        # Delete file from filesystem if it exists
-        if image.get('filename'):
-            file_path = UPLOAD_DIR / image['filename']
-            if file_path.exists():
-                file_path.unlink()
-                logging.info(f"Deleted file: {file_path}")
-        
-        # Delete from database
-        result = await db.gallery.delete_one({"id": image_id})
-        if result.deleted_count == 0:
-            raise HTTPException(status_code=404, detail="Image not found")
-        
-        return {"status": "success", "message": "Image deleted successfully"}
-    except HTTPException:
-        raise
-    except Exception as e:
-        logging.error(f"Gallery delete error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to delete image")
+    @api_router.delete("/gallery/{image_id}")
+    async def delete_gallery_image(image_id: str, current_user: str = Depends(verify_token)):
+        """Delete image from gallery (admin only)"""
+        try:
+            # Find the image in database
+            image = await app.database.gallery.find_one({"id": image_id})
+            if not image:
+                raise HTTPException(status_code=404, detail="Image not found")
+            
+            # Delete file from filesystem if it exists
+            if image.get('filename'):
+                file_path = UPLOAD_DIR / image['filename']
+                if file_path.exists():
+                    file_path.unlink()
+                    logging.info(f"Deleted file: {file_path}")
+            
+            # Delete from database
+            result = await app.database.gallery.delete_one({"id": image_id})
+            if result.deleted_count == 0:
+                raise HTTPException(status_code=404, detail="Image not found")
+            
+            return {"status": "success", "message": "Image deleted successfully"}
+        except HTTPException:
+            raise
+        except Exception as e:
+            logging.error(f"Gallery delete error: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to delete image")
 
-@api_router.get("/admin/dashboard")
-async def admin_dashboard(current_user: str = Depends(verify_token)):
-    """Get admin dashboard data"""
-    try:
-        total_registrations = await db.student_registrations.count_documents({})
-        total_partnerships = await db.partnerships.count_documents({})
-        total_gallery = await db.gallery.count_documents({})
-        
-        # Get recent registrations
-        recent_registrations = await db.student_registrations.find().sort("created_at", -1).limit(5).to_list(5)
-        recent_partnerships = await db.partnerships.find().sort("created_at", -1).limit(5).to_list(5)
-        
-        return {
-            "stats": {
-                "total_registrations": total_registrations,
-                "total_partnerships": total_partnerships,
-                "total_gallery": total_gallery
-            },
-            "recent_registrations": [StudentRegistration(**reg) for reg in recent_registrations],
-            "recent_partnerships": [Partnership(**partnership) for partnership in recent_partnerships]
-        }
-    except Exception as e:
-        logging.error(f"Admin dashboard error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to fetch dashboard data")
+    @api_router.get("/admin/dashboard")
+    async def admin_dashboard(current_user: str = Depends(verify_token)):
+        """Get admin dashboard data"""
+        try:
+            total_registrations = await app.database.student_registrations.count_documents({})
+            total_partnerships = await app.database.partnerships.count_documents({})
+            total_gallery = await app.database.gallery.count_documents({})
+            
+            # Get recent registrations
+            recent_registrations = await app.database.student_registrations.find().sort("created_at", -1).limit(5).to_list(5)
+            recent_partnerships = await app.database.partnerships.find().sort("created_at", -1).limit(5).to_list(5)
+            
+            return {
+                "stats": {
+                    "total_registrations": total_registrations,
+                    "total_partnerships": total_partnerships,
+                    "total_gallery": total_gallery
+                },
+                "recent_registrations": [StudentRegistration(**reg) for reg in recent_registrations],
+                "recent_partnerships": [Partnership(**partnership) for partnership in recent_partnerships]
+            }
+        except Exception as e:
+            logging.error(f"Admin dashboard error: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to fetch dashboard data")
 
-@api_router.get("/check-email/{email}")
-async def check_email_availability(email: EmailStr):
-    """Check if email is already registered"""
-    try:
-        student_exists = await db.student_registrations.find_one({"email": email})
-        partnership_exists = await db.partnerships.find_one({"email": email})
-        
-        return {
-            "email": email,
-            "available": not (student_exists or partnership_exists),
-            "student_registered": bool(student_exists),
-            "partnership_registered": bool(partnership_exists)
-        }
-    except Exception as e:
-        logging.error(f"Email check error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to check email availability")
+    @api_router.get("/check-email/{email}")
+    async def check_email_availability(email: EmailStr):
+        """Check if email is already registered"""
+        try:
+            student_exists = await app.database.student_registrations.find_one({"email": email})
+            partnership_exists = await app.database.partnerships.find_one({"email": email})
+            
+            return {
+                "email": email,
+                "available": not (student_exists or partnership_exists),
+                "student_registered": bool(student_exists),
+                "partnership_registered": bool(partnership_exists)
+            }
+        except Exception as e:
+            logging.error(f"Email check error: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to check email availability")
 
-@api_router.get("/health")
-async def health_check():
-    return {"status": "healthy", "service": "whibc-api"}
+    @api_router.get("/health")
+    async def health_check():
+        return {"status": "healthy", "service": "whibc-api"}
 
+    print("DEBUG: API routes defined")
 
-# Include the router in the main app
-app.include_router(api_router)
+    # =======================
+    # FINAL APP SETUP
+    # =======================
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    print("DEBUG: Including router in main app")
+    app.include_router(api_router)
+    print("DEBUG: Router included")
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+    print("DEBUG: Setting up CORS middleware")
+    app.add_middleware(
+        CORSMiddleware,
+        allow_credentials=True,
+        allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    print("DEBUG: CORS setup complete")
 
+    print("DEBUG: Setting up logging")
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    logger = logging.getLogger(__name__)
+    print("DEBUG: Logging setup complete")
 
-# Debug version
-# Fixed: Removed duplicates and using lifespan pattern
-# COMPLETE REWRITE: Fixed duplicates and lifespan pattern
+    print("DEBUG: Application setup complete - server ready to start")
+
+except Exception as e:
+    print(f"🔴 SYNTAX ERROR IN MAIN CODE: {e}")
+    print(f"🔴 ERROR TYPE: {type(e).__name__}")
+    import traceback
+    traceback.print_exc()
+    sys.exit(1)
+
+if __name__ == "__main__":
+    print("DEBUG: Starting uvicorn server")
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
