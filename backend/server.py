@@ -264,21 +264,21 @@ try:
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-    async def save_uploaded_file(file: UploadFile, prefix: str) -> tuple:
-        """Save uploaded file and return filename and path"""
-        if file.filename:
-            # Generate unique filename
-            file_extension = Path(file.filename).suffix
-            unique_filename = f"{prefix}_{uuid.uuid4()}{file_extension}"
-            file_path = UPLOAD_DIR / unique_filename
-            
-            # Save file
-            async with aiofiles.open(file_path, 'wb') as buffer:
-                content = await file.read()
-                await buffer.write(content)
-            
-            return unique_filename, str(file_path)
-        return None, None
+async def save_uploaded_file(file: UploadFile, prefix: str) -> tuple:
+    if file.filename:
+        cloudinary.config(
+            cloud_name=os.environ.get(‘wordofhopebibleinstitute’),
+            api_key=os.environ.get('213535953419514'),
+            api_secret=os.environ.get('glGxwmjj5In4Kvtkhe1KaFBWjV0')
+        )
+        content = await file.read()
+        result = cloudinary.uploader.upload(
+            content,
+            public_id=f"{prefix}_{uuid.uuid4()}",
+            folder="whibc"
+        )
+        return result['public_id'], result['secure_url']
+    return None, None
 
     def send_registration_confirmation(email: str, full_name: str, program: str):
         """Send registration confirmation email"""
