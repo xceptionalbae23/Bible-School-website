@@ -44,6 +44,8 @@ try:
     print("DEBUG: hashlib imported")
     from contextlib import asynccontextmanager
     print("DEBUG: ALL IMPORTS SUCCESSFUL!")
+    import cloudinary
+import cloudinary.uploader
     
 except Exception as e:
     print(f"ERROR: IMPORT ERROR: {e}")
