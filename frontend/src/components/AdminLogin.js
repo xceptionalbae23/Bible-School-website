@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Lock, User, Eye, EyeOff, Shield, CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { Lock, User, Eye, EyeOff, Shield, AlertCircle, Loader } from 'lucide-react';
 import { toast } from 'sonner';
 
 const AdminLogin = ({ onLoginSuccess }) => {
@@ -15,150 +15,336 @@ const AdminLogin = ({ onLoginSuccess }) => {
     reset
   } = useForm();
 
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
   const onSubmit = async (data) => {
     setIsLoading(true);
     setLoginError('');
 
-    // REAL CREDENTIALS FROM BACKEND
-    const validUsername = 'admin';
-    const validPassword = 'whibc2025';
-    const validSuperadmin = 'superadmin';
-    const validSuperadminPassword = 'whibc@admin2025';
-
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    if ((data.username === validUsername && data.password === validPassword) ||
-        (data.username === validSuperadmin && data.password === validSuperadminPassword)) {
-      
-      // Store mock token and admin info
-      localStorage.setItem('admin_token', 'mock_jwt_token_' + Date.now());
-      localStorage.setItem('admin_info', JSON.stringify({
-        id: 1,
-        username: data.username,
-        email: data.username + '@wordofhopebibleinstitute.com',
-        role: data.username === 'superadmin' ? 'super_admin' : 'admin'
-      }));
-      
-      toast.success('Login successful! Welcome to Word of Hope Bible Institute Admin Dashboard.');
-      
-      // Call the success callback
-      onLoginSuccess({
-        access_token: 'mock_jwt_token_' + Date.now(),
-        admin_info: {
-          id: 1,
-          username: data.username,
-          email: data.username + '@wordofhopebibleinstitute.com',
-          role: data.username === 'superadmin' ? 'super_admin' : 'admin'
-        }
+    try {
+      const response = await fetch(`${backendUrl}/api/admin/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
       });
-      
-      reset();
-    } else {
-      setLoginError('Invalid credentials. Use: admin/whibc2025 or superadmin/whibc@admin2025');
-      toast.error('Login failed. Please check your credentials.');
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Store token in localStorage
+        localStorage.setItem('admin_token', result.access_token);
+        localStorage.setItem('admin_info', JSON.stringify(result.admin_info));
+        
+        toast.success('Login successful! Welcome to WHIBC Admin Dashboard.');
+        
+        // Call the success callback
+        onLoginSuccess(result);
+        
+        reset();
+      } else {
+        setLoginError(result.detail || 'Login failed. Please check your credentials.');
+        toast.error('Login failed. Please check your credentials.');
+      }
+    } catch (error) {
+      setLoginError('Login failed. Please try again.');
+      toast.error('Login failed. Please try again.');
+      console.error('Login error:', error);
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
-        <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-4">
-            <Shield className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">Admin Portal</h1>
-          <p className="text-gray-600 mt-2">Word of Hope Bible Institute</p>
+    <div className="admin-login">
+      <div className="login-container">
+        <div className="login-header">
+          <Shield className="w-16 h-16 text-primary mx-auto mb-4" />
+          <h1>WHIBC Admin Login</h1>
+          <p>Access the administrative dashboard</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+        <form onSubmit={handleSubmit(onSubmit)} className="login-form">
+          <div className="form-group">
+            <label className="form-label">
+              <User className="w-5 h-5" />
               Username
             </label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                {...register('username', { required: 'Username is required' })}
-                type="text"
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="Enter username"
-              />
-            </div>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Enter your username"
+              {...register('username', { 
+                required: 'Username is required',
+                minLength: { value: 3, message: 'Username must be at least 3 characters' }
+              })}
+            />
             {errors.username && (
-              <p className="text-red-600 text-sm mt-1 flex items-center">
-                <AlertCircle className="w-4 h-4 mr-1" />
+              <span className="error-message">
+                <AlertCircle className="w-4 h-4" />
                 {errors.username.message}
-              </p>
+              </span>
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="form-group">
+            <label className="form-label">
+              <Lock className="w-5 h-5" />
               Password
             </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className="password-input-container">
               <input
-                {...register('password', { required: 'Password is required' })}
                 type={showPassword ? 'text' : 'password'}
-                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="Enter password"
+                className="form-input"
+                placeholder="Enter your password"
+                {...register('password', { 
+                  required: 'Password is required',
+                  minLength: { value: 6, message: 'Password must be at least 6 characters' }
+                })}
               />
               <button
                 type="button"
+                className="password-toggle"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-600 text-sm mt-1 flex items-center">
-                <AlertCircle className="w-4 h-4 mr-1" />
+              <span className="error-message">
+                <AlertCircle className="w-4 h-4" />
                 {errors.password.message}
-              </p>
+              </span>
             )}
           </div>
 
           {loginError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-700 text-sm flex items-center">
-                <AlertCircle className="w-4 h-4 mr-2" />
-                {loginError}
-              </p>
+            <div className="login-error">
+              <AlertCircle className="w-5 h-5" />
+              <span>{loginError}</span>
             </div>
           )}
-
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-blue-700 text-sm">
-              <strong>Admin Credentials:</strong><br />
-              Username: <code>admin</code> | Password: <code>whibc2025</code><br />
-              Username: <code>superadmin</code> | Password: <code>whibc@admin2025</code>
-            </p>
-          </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-600 hover:to-indigo-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="btn btn-primary login-btn"
           >
             {isLoading ? (
               <>
-                <Loader className="w-5 h-5 mr-2 animate-spin" />
-                Signing in...
+                <Loader className="w-5 h-5 animate-spin" />
+                Logging in...
               </>
             ) : (
               <>
-                <CheckCircle className="w-5 h-5 mr-2" />
-                Sign In
+                <Shield className="w-5 h-5" />
+                Login to Dashboard
               </>
             )}
           </button>
         </form>
       </div>
+
+      <style jsx>{`
+        .admin-login {
+          min-height: 100vh;
+          background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-green) 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem;
+        }
+
+        .login-container {
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+          overflow: hidden;
+          width: 100%;
+          max-width: 500px;
+        }
+
+        .login-header {
+          background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-green) 100%);
+          color: white;
+          padding: 3rem 2rem;
+          text-align: center;
+        }
+
+        .login-header h1 {
+          color: white;
+          font-size: 2rem;
+          margin-bottom: 0.5rem;
+          font-weight: 700;
+        }
+
+        .login-header p {
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0;
+        }
+
+        .login-form {
+          padding: 3rem 2rem;
+        }
+
+        .form-group {
+          margin-bottom: 2rem;
+        }
+
+        .form-label {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.75rem;
+          font-weight: 600;
+          color: var(--text-dark);
+        }
+
+        .form-input {
+          width: 100%;
+          padding: 1rem;
+          border: 2px solid var(--gray-200);
+          border-radius: 10px;
+          font-family: 'Source Sans Pro', sans-serif;
+          transition: all 0.3s ease;
+          background: white;
+        }
+
+        .form-input:focus {
+          outline: none;
+          border-color: var(--primary-blue);
+          box-shadow: 0 0 0 3px rgba(30, 74, 114, 0.1);
+        }
+
+        .password-input-container {
+          position: relative;
+        }
+
+        .password-toggle {
+          position: absolute;
+          right: 1rem;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          color: var(--text-medium);
+          cursor: pointer;
+          padding: 0.5rem;
+          border-radius: 5px;
+          transition: all 0.3s ease;
+        }
+
+        .password-toggle:hover {
+          color: var(--primary-blue);
+          background: var(--light-blue);
+        }
+
+        .error-message {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: #dc3545;
+          font-size: 0.85rem;
+          margin-top: 0.5rem;
+        }
+
+        .login-error {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 1rem;
+          background: #ffebee;
+          color: #c62828;
+          border: 1px solid #c62828;
+          border-radius: 10px;
+          margin-bottom: 2rem;
+          font-weight: 500;
+        }
+
+        .login-btn {
+          width: 100%;
+          padding: 1rem 2rem;
+          font-size: 1.1rem;
+          font-weight: 600;
+        }
+
+        .login-btn:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+
+        .login-info {
+          background: var(--gray-50);
+          padding: 2rem;
+          border-top: 1px solid var(--gray-200);
+        }
+
+        .info-card {
+          margin-bottom: 2rem;
+        }
+
+        .info-card h4 {
+          color: var(--primary-blue);
+          margin-bottom: 1rem;
+        }
+
+        .info-card p {
+          color: var(--text-medium);
+          margin-bottom: 1rem;
+        }
+
+        .info-card ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+
+        .info-card li {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 0;
+          color: var(--text-medium);
+          font-size: 0.9rem;
+        }
+
+        .info-card li svg {
+          color: var(--secondary-green);
+        }
+
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        .animate-spin {
+          animation: spin 1s linear infinite;
+        }
+
+        @media (max-width: 768px) {
+          .admin-login {
+            padding: 1rem;
+          }
+
+          .login-header {
+            padding: 2rem 1.5rem;
+          }
+
+          .login-header h1 {
+            font-size: 1.75rem;
+          }
+
+          .login-form {
+            padding: 2rem 1.5rem;
+          }
+
+          .login-info {
+            padding: 1.5rem;
+          }
+        }
+      `}</style>
     </div>
   );
 };
